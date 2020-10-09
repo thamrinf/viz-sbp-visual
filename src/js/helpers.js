@@ -30,5 +30,5 @@ function hxlProxyToJSON(input){
 function createKeyFigure(target, title, className, value) {
   var targetDiv = $(target);
   //<p class='date small'><span>"+ date +"</span></p>
-  return targetDiv.append("<div class='key-figure'><div class='inner'><h3>"+ title +"</h3><div class='num " + className + "'>"+ numFormat(value) +"</div></div></div></div>");
+  return targetDiv.append("<div class='key-figure col-4'><div class='inner'><h3>"+ title +"</h3><div class='num " + className + "'>"+ numFormat(value) +"</div></div></div></div>");
 }

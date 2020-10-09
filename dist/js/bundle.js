@@ -15,9 +15,9 @@ var pieLangTitle = 'Language Requirements',
 	pieGenderTitle = 'Deployments by Gender',
 	pieLevelTitle = 'Deployments by Level';
 
-$('#piecharts').append('<div class="pie"><div><h3>'+pieLangTitle+'</h3><div id="pieLang"></div></div>');
-$('#piecharts').append('<div class="pie"><div><h3>'+pieGenderTitle+'</h3><div id="pieGender"></div></div>');
-$('#piecharts').append('<div class="pie"><div><h3>'+pieLevelTitle+'</h3><div id="pieLevel"></div></div>');
+$('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLangTitle+'</h3><div id="pieLang"></div></div>');
+$('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieGenderTitle+'</h3><div id="pieGender"></div></div>');
+$('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLevelTitle+'</h3><div id="pieLevel"></div></div>');
 
 function generatePieChart(data) {
 	// piechart lang req
@@ -27,11 +27,14 @@ function generatePieChart(data) {
 			size: { width: 250, height: 200},
 			data: {
 				columns: [
-					['FR', 20],
 					['EN', 50],
-					['ES', 30]
+					['ES', 30],
+					['FR', 20]
 				],
-			type: 'donut'
+				type: 'donut'
+			},
+			color: {
+				pattern: ['#1EBFB3', '#71D7CF', '#C7EFEC']
 			}
 		});
 	} else {
@@ -48,7 +51,10 @@ function generatePieChart(data) {
 					['Male', 50],
 					['Female', 50]
 				],
-			type: 'donut'
+				type: 'donut'
+			},
+			color: {
+				pattern: ['#9C27B0', '#DEB8E5']
 			}
 		});
 	} else {
@@ -67,7 +73,10 @@ function generatePieChart(data) {
 					['P5', 30],
 					['P3/P4', 10]
 				],
-			type: 'donut'
+				type: 'donut'
+			},
+			color: {
+				pattern: ['#2AA02C', '#79C37A', '#52B153', '#CAE7CA']
 			}
 		});
 	} else {
@@ -84,16 +93,16 @@ var barchartPositionTitle = 'Deployments by Position',
 	barchartOrgTitle = 'Deployments by Gender',
 	barchartCountriesTitle = 'Deployments by Level';
 
-$('#barcharts').append('<div class="barchart"><div><h3>'+barchartPositionTitle+'</h3><div id="barchartPosition"></div></div>');
-$('#barcharts').append('<div class="barchart"><div><h3>'+barchartOrgTitle+'</h3><div id="barchartOrg"></div></div>');
-$('#barcharts').append('<div class="barchart"><div><h3>'+barchartCountriesTitle+'</h3><div id="barchartCountries"></div></div>');
+$('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartPositionTitle+'</h3><div id="barchartPosition"></div></div>');
+$('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartOrgTitle+'</h3><div id="barchartOrg"></div></div>');
+$('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartCountriesTitle+'</h3><div id="barchartCountries"></div></div>');
 
 function generateBarChart() {
 	//barchart deployment by position
 	barchartPosition = c3.generate({
 		bindto: '#barchartPosition',
-		size: { width: 250, height: 200 },
-		// padding: {right: 15},
+		size: { height: 200 },
+		padding: {right: 15, left: 60},
 	    data: {
 	        x: 'x',
 	        columns: [
@@ -103,7 +112,9 @@ function generateBarChart() {
 	        type: 'bar',
 
 	    },
-
+	    color: {
+	    	pattern: ['#009EDB']
+	    },
 	    axis: {
 	        rotated : true,
 	      x: {
@@ -125,8 +136,8 @@ function generateBarChart() {
 	//barchart deployment by partner org
 	barchartOrg = c3.generate({
 		bindto: '#barchartOrg',
-		size: { width: 250, height: 200 },
-		// padding: {right: 15},
+		size: { height: 200 },
+		padding: {right: 15, left: 60},
 	    data: {
 	        x: 'x',
 	        columns: [
@@ -134,32 +145,33 @@ function generateBarChart() {
 	        	[413, 233, 123, 90]
 	        ],
 	        type: 'bar',
-
 	    },
-
+	    color: {
+	    	pattern: ['#009EDB']
+	    },
 	    axis: {
-	        rotated : true,
-	      x: {
-	          type : 'category',
-	          tick: {
-	          	outer: false
-	          }
-	      },
-	      y: {
-	      	tick: {
-	      		outer: false,
-	      		format: d3.format('.2s'),
-	      		count: 5,
-	      	}
-	      } 
+			rotated : true,
+			x: {
+				type : 'category',
+				tick: {
+					outer: false
+				}
+			},
+			y: {
+				tick: {
+					outer: false,
+					format: d3.format('.2s'),
+					count: 5,
+				}
+			} 
 	    }
 	});
 
 	//barchart deployment by position
 	barchartCountries = c3.generate({
 		bindto: '#barchartCountries',
-		size: { width: 250, height: 200 },
-		// padding: {right: 15},
+		size: { height: 200 },
+		padding: {right: 15, left: 60},
 	    data: {
 	        x: 'x',
 	        columns: [
@@ -169,7 +181,9 @@ function generateBarChart() {
 	        type: 'bar',
 
 	    },
-
+	    color: {
+	    	pattern: ['#009EDB']
+	    },
 	    axis: {
 	        rotated : true,
 	      x: {
@@ -225,7 +239,7 @@ function hxlProxyToJSON(input){
 function createKeyFigure(target, title, className, value) {
   var targetDiv = $(target);
   //<p class='date small'><span>"+ date +"</span></p>
-  return targetDiv.append("<div class='key-figure'><div class='inner'><h3>"+ title +"</h3><div class='num " + className + "'>"+ numFormat(value) +"</div></div></div></div>");
+  return targetDiv.append("<div class='key-figure col-4'><div class='inner'><h3>"+ title +"</h3><div class='num " + className + "'>"+ numFormat(value) +"</div></div></div></div>");
 }
 var numFormat = d3.format(',');
 const DATA_URL = 'https://proxy.hxlstandard.org/api/data-preview.json?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F1exDoZsA8UQx-U5YGSS4zxivfPIOUf8-ts2CbavV7Mvg%2Fedit%23gid%3D255428484&format=csv';
