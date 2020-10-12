@@ -1188,7 +1188,6 @@ h3 {
   position: relative;
   width: 100%; }
   #map .map-regions {
-    fill: #F2F2EF;
     stroke: #CCC;
     cursor: pointer; }
   #map .zoom-controls {

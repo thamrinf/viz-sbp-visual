@@ -1,115 +1,110 @@
 var dimension, group, 
 	leftBarChart;
 
-function drawLeftChart (argument) {
-	var cf = crossfilter(sbpData);
+function drawRankingChart(data) {
+	var margin = {top: 0, right: 40, bottom: 30, left: 50};
+	var width = 300,
+		height = 500;
+	var barColor = '#009EDB' ;
+  	var maxVal = 100;
+  	var barHeight = 25;
+  	var barPadding = 20;
 
-	dimension = cf.dimension(function(d){ return d['Partner/Organisation'];});
-	
+	// data = [10, 30, 50, 56, 78, 100];
+
+	var maxVal = data[0].value; // data is sorted by value
+	var x = d3.scaleLinear()
+	    .domain([0, maxVal])
+	    .range([0, width - margin.left - margin.right]);
+
+	  // set the ranges
+	var y = d3.scaleBand().range([0, height]);
+	  y.domain(data.map(function(d) { return d.value; }));
+
+	var svg = d3.select('#rankingChart').append('svg')
+				.attr('width', width)
+				.attr('height', height)
+				.append('g')
+				.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+
+	// add the x axis
+	svg.append('g')
+	    .attr('transform', 'translate(0, '+height+')')
+	    .call(d3.axisBottom(x)
+	      .tickSizeOuter(0)
+	      .ticks(5, 's'));
+
+	// append bars
+	bars = svg.selectAll('.bar')
+	      .data(data)
+	      .enter().append('g')
+	      .attr('class', 'bar-container')
+	      .attr('transform', function(d, i) { return 'translate(' + 0 + ', ' + (y(d.value)+30) + ')'; });
+
+	bars.append('rect')
+	    .attr('class', 'bar')
+	    .attr('fill', barColor)
+	    .attr('height', barHeight)
+	    .attr('width', function(d) {
+	    	return d.value;
+	    });	
+
+	 // add min/max labels
+	bars.append('text')
+	    .attr('class', 'label-num')
+	    .attr('x', function(d) {
+	      return 200;
+	    })
+	    .attr('y', function(d) { return barHeight/2 + 4; })
+	    .text(function (d) {
+	      return d3.format('.3s')(d.value);
+	    });
+
+	bars.append('text')
+	    .attr('class', 'label-num')
+	    // .attr('text-anchor', 'start')
+	    .attr('x', 0)
+	    .attr('y', function(d) { return -4; })
+	    .text(function (d) {
+	      return d.key; //d3.format('.3s')(d.value);
+	    });
 }
 
 var pieLang, pieGender, pieLevel;
 
-var pieLangTitle = 'Language Requirements',
-	pieGenderTitle = 'Deployments by Gender',
-	pieLevelTitle = 'Deployments by Level';
-
-$('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLangTitle+'</h3><div id="pieLang"></div></div>');
-$('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieGenderTitle+'</h3><div id="pieGender"></div></div>');
-$('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLevelTitle+'</h3><div id="pieLevel"></div></div>');
-
-function generatePieChart(data) {
+function generatePieChart(chart, data, bind) {
 	// piechart lang req
-	if (pieLang == undefined) {
-		pieLang = c3.generate({
-			bindto: '#pieLang',
-			size: { width: 250, height: 200},
-			data: {
-				columns: [
-					['EN', 50],
-					['ES', 30],
-					['FR', 20]
-				],
-				type: 'donut'
-			},
-			color: {
-				pattern: ['#1EBFB3', '#71D7CF', '#C7EFEC']
-			}
-		});
-	} else {
-		//update
-	}
 
-	// piechart gender
-	if (pieGender == undefined) {
-		pieGender = c3.generate({
-			bindto: '#pieGender',
-			size: { width: 250, height: 200},
-			data: {
-				columns: [
-					['Male', 50],
-					['Female', 50]
-				],
-				type: 'donut'
-			},
-			color: {
-				pattern: ['#9C27B0', '#DEB8E5']
-			}
-		});
-	} else {
-		//update
-	}
-
-	// piechart deployment level
-	if (pieLevel == undefined) {
-		pieLevel = c3.generate({
-			bindto: '#pieLevel',
-			size: { width: 250, height: 200},
-			data: {
-				columns: [
-					['P3', 50],
-					['P4', 10],
-					['P5', 30],
-					['P3/P4', 10]
-				],
-				type: 'donut'
-			},
-			color: {
-				pattern: ['#2AA02C', '#79C37A', '#52B153', '#CAE7CA']
-			}
-		});
-	} else {
-		//update
-	}
-	 
+	chart = c3.generate({
+		bindto: '#'+bind,
+		size: { width: 250, height: 200},
+		data: {
+			columns: data,
+			type: 'donut'
+		},
+		color: {
+			pattern: ['#1EBFB3', '#71D7CF', '#C7EFEC']
+		}
+	});
 }
 
 var barchartPosition,
 	barchartOrg,
 	barchartCountries;
 
-var barchartPositionTitle = 'Deployments by Position',
-	barchartOrgTitle = 'Deployments by Gender',
-	barchartCountriesTitle = 'Deployments by Level';
 
-$('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartPositionTitle+'</h3><div id="barchartPosition"></div></div>');
-$('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartOrgTitle+'</h3><div id="barchartOrg"></div></div>');
-$('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartCountriesTitle+'</h3><div id="barchartCountries"></div></div>');
 
-function generateBarChart() {
+function generateBarChart(chart, data, bind) {
 	//barchart deployment by position
-	barchartPosition = c3.generate({
-		bindto: '#barchartPosition',
-		size: { height: 200 },
+	chart = c3.generate({
+		bindto: '#'+bind,
+		size: { height: 500 },
 		padding: {right: 15, left: 60},
 	    data: {
 	        x: 'x',
-	        columns: [
-	        	['x', 'IMO', 'HAO', 'Education Officer', 'GBV Specialist'],
-	        	[413, 233, 123, 90]
-	        ],
-	        type: 'bar',
-
+	        columns: data,
+	        type: 'bar'
 	    },
 	    color: {
 	    	pattern: ['#009EDB']
@@ -132,74 +127,6 @@ function generateBarChart() {
 	    }
 	}); 
 
-	//barchart deployment by partner org
-	barchartOrg = c3.generate({
-		bindto: '#barchartOrg',
-		size: { height: 200 },
-		padding: {right: 15, left: 60},
-	    data: {
-	        x: 'x',
-	        columns: [
-	        	['x', 'IMO', 'HAO', 'Education Officer', 'GBV Specialist'],
-	        	[413, 233, 123, 90]
-	        ],
-	        type: 'bar',
-	    },
-	    color: {
-	    	pattern: ['#009EDB']
-	    },
-	    axis: {
-			rotated : true,
-			x: {
-				type : 'category',
-				tick: {
-					outer: false
-				}
-			},
-			y: {
-				tick: {
-					outer: false,
-					format: d3.format('.2s'),
-					count: 5,
-				}
-			} 
-	    }
-	});
-
-	//barchart deployment by position
-	barchartCountries = c3.generate({
-		bindto: '#barchartCountries',
-		size: { height: 200 },
-		padding: {right: 15, left: 60},
-	    data: {
-	        x: 'x',
-	        columns: [
-	        	['x', 'IMO', 'HAO', 'Education Officer', 'GBV Specialist'],
-	        	[413, 233, 123, 90]
-	        ],
-	        type: 'bar',
-
-	    },
-	    color: {
-	    	pattern: ['#009EDB']
-	    },
-	    axis: {
-	        rotated : true,
-	      x: {
-	          type : 'category',
-	          tick: {
-	          	outer: false
-	          }
-	      },
-	      y: {
-	      	tick: {
-	      		outer: false,
-	      		format: d3.format('.2s'),
-	      		count: 5,
-	      	}
-	      } 
-	    }
-	});
 }//generateBarChart
 
 

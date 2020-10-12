@@ -32,3 +32,43 @@ function createKeyFigure(target, title, className, value) {
   //<p class='date small'><span>"+ date +"</span></p>
   return targetDiv.append("<div class='key-figure col-4'><div class='inner'><h3>"+ title +"</h3><div class='num " + className + "'>"+ numFormat(value) +"</div></div></div></div>");
 }
+
+
+function getFormattedDataByIndicator(indicator) {
+    var data = [];
+    var dataByInd = d3.nest()
+        .key(function(d){ return d[indicator];})
+        .rollup(function(d) { return d.length; })
+        .entries(sbpFilteredData).sort(sort_value);
+
+    var total = d3.sum(dataByInd, function(d){ return d.value ;});
+    dataByInd.forEach( function(element, index) {
+        var pct = (element.value/total)*100 ;
+        data.push([element.key, pct]);
+    });
+
+   return data; 
+
+}
+
+function getDataByIndicator(indicator) {
+    var dataX = ['x'],
+        dataY = [];
+    var dataByInd = d3.nest()
+        .key(function(d){ return d[indicator];})
+        .rollup(function(d) { return d.length; })
+        .entries(sbpFilteredData).sort(sort_value);
+
+    dataByInd.forEach( function(element, index) {
+        dataX.push(element.key);
+        dataY.push(element.value);
+    });
+   return [dataX, dataY]; 
+
+}
+
+var sort_value = function (d1, d2) {
+    if (d1.value > d2.value) return -1;
+    if (d1.value < d2.value) return 1;
+    return 0;
+}

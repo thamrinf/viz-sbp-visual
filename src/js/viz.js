@@ -4,7 +4,19 @@ let isMobile = $(window).width()<600? true : false;
 let geoDataURL = 'data/worldmap.json';
 
 let geomData, 
-    sbpData;
+    sbpData,
+    sbpFilteredData;
+
+let dataByAgencies, 
+    dataByRoster;
+
+let dataFilterBy = 'Organization'; 
+
+let countries = [],
+    dutyStations = [];
+
+
+let mapCountryColor = '#1EBFB3';//'#71D7CF';//'#C7EFEC';//'#1EBFB3';//'#009EDB';//'#fec44f';
 
 $( document ).ready(function() {
 
@@ -16,23 +28,87 @@ $( document ).ready(function() {
       geomData = topojson.feature(data[0], data[0].objects.geom);
       sbpData = data[1];
 
+      sbpData.forEach( function(element, index) {
+        countries.includes(element['ISO3 code']) ? '' : countries.push(element['ISO3 code']);
+        dutyStations.includes(element['Duty Station']) ? '' : dutyStations.push(element['Duty Station']);
+      });
+
+      console.log(sbpData)
+
+      sbpFilteredData = sbpData;
+
+      // sbpFilteredData = d3.nest()
+      //         .key(function(d){ return d['Organization']; })
+  
+      dataByAgencies = d3.nest()
+        .key(function(d){ return d['Organization']; })
+        .rollup(function(d) { return d.length; })
+        .entries(sbpData).sort(sort_value);
+
+      dataByRoster = d3.nest()
+        .key(function(d){ return d['Partner/Organisation']; })
+        .rollup(function(d) { return d.length; })
+        .entries(sbpData).sort(sort_value);
+
       initMap();
-      createKeyFigure("#keyfig", "Deployments", "className", 768);
-      createKeyFigure("#keyfig", "Duty Stations", "className", 249);
-      createKeyFigure("#keyfig", "Countries", "className", 138);
-      generatePieChart();
-      generateBarChart();
-      drawLeftChart();
+      drawRankingChart(dataByAgencies);
+      initDisplay();
+      
+       // key figures
+      var deployments = d3.sum(dataByAgencies, function(d){ return d.value;});
+      createKeyFigure("#keyfig", "Deployments", "className", deployments);
+      createKeyFigure("#keyfig", "Countries", "className", countries.length);
+      createKeyFigure("#keyfig", "Duty Stations", "className", dutyStations.length);
+ 
       //remove loader and show vis
       $('.loader').hide();
       $('main, footer').css('opacity', 1);
     });
   } //getData
 
+function initDisplay() {
 
+  
+
+  // donut charts
+  var langData = getFormattedDataByIndicator('Language Requirements');
+  var genderData  = getFormattedDataByIndicator('Gender');
+  var levelData  = getFormattedDataByIndicator('Grade');
+
+  var pieLangTitle = 'Language Requirements',
+      pieGenderTitle = 'Deployments by Gender',
+      pieLevelTitle = 'Deployments by Level';
+
+  $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLangTitle+'</h3><div id="pieLang"></div></div>');
+  $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieGenderTitle+'</h3><div id="pieGender"></div></div>');
+  $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLevelTitle+'</h3><div id="pieLevel"></div></div>');
+
+  generatePieChart(pieLang, langData, 'pieLang');
+  generatePieChart(pieGender, genderData, 'pieGender');
+  generatePieChart(pieLevel, levelData, 'pieLevel');
+
+  // bar charts
+
+  var positionData = getDataByIndicator('Functional Area');
+  var partnerData = getDataByIndicator('Partner/Organisation');
+
+  // var positionData = getFormattedDataByIndicator('Title/Position/Function');
+
+  var barchartPositionTitle = 'Deployments by Position',
+      barchartOrgTitle = 'Deployments by partner org',
+      barchartCountriesTitle = 'Deployments by funding';
+
+  $('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartPositionTitle+'</h3><div id="barchartPosition"></div></div>');
+  $('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartOrgTitle+'</h3><div id="barchartOrg"></div></div>');
+  $('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartCountriesTitle+'</h3><div id="barchartCountries"></div></div>');
+
+  generateBarChart(barchartPosition,positionData, 'barchartPosition');
+  generateBarChart(barchartOrg, partnerData, 'barchartOrg');
+
+} //initDisplay
 
   function drawMap(){
-
+    console.log(countries)
     var width = $('#map').width();//viewportWidth;
     var height = 400;//(isMobile) ? viewportHeight * .5 : viewportHeight;
     var mapScale = width/3.5;//(isMobile) ? width/3.5 : width/5.5;
@@ -74,7 +150,11 @@ $( document ).ready(function() {
             return d.properties.ISO_A3;
           })
           .attr("d", path)
-          .attr("fill", '#CCC');
+          .attr("fill", function(d){
+            var color = '#F2F2EF';
+            countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
+            return color;
+          });
 
   }
 
@@ -90,6 +170,24 @@ $( document ).ready(function() {
       // createMapLegend();
     }, 100);
   }
+
+$("input[name='agencies']").change(function() {
+  if(this.checked) {
+      $("input[name='roster']").prop('checked', false);
+      dataFilterBy = 'Organization';
+      d3.select('#rankingChart').select('svg').remove();
+      drawRankingChart(dataByAgencies);
+  }
+});
+
+$("input[name='roster']").change(function() {
+  if(this.checked) {
+      $("input[name='agencies']").prop('checked', false);
+      dataFilterBy = 'Partner/Organisation';
+      d3.select('#rankingChart').select('svg').remove();
+      drawRankingChart(dataByRoster);
+  }
+});
 
   function initTracking() {
     //initialize mixpanel
