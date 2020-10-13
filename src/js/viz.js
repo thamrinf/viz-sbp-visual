@@ -33,7 +33,6 @@ $( document ).ready(function() {
         dutyStations.includes(element['Duty Station']) ? '' : dutyStations.push(element['Duty Station']);
       });
 
-      console.log(sbpData)
 
       sbpFilteredData = sbpData;
 
@@ -66,49 +65,49 @@ $( document ).ready(function() {
     });
   } //getData
 
-function initDisplay() {
+  function initDisplay() {
 
-  
+    
 
-  // donut charts
-  var langData = getFormattedDataByIndicator('Language Requirements');
-  var genderData  = getFormattedDataByIndicator('Gender');
-  var levelData  = getFormattedDataByIndicator('Grade');
+    // donut charts
+    var langData = getFormattedDataByIndicator('Language Requirements');
+    var genderData  = getFormattedDataByIndicator('Gender');
+    var levelData  = getFormattedDataByIndicator('Grade');
 
-  var pieLangTitle = 'Language Requirements',
-      pieGenderTitle = 'Deployments by Gender',
-      pieLevelTitle = 'Deployments by Level';
+    var pieLangTitle = 'Language Requirements',
+        pieGenderTitle = 'Deployments by Gender',
+        pieLevelTitle = 'Deployments by Level';
 
-  $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLangTitle+'</h3><div id="pieLang"></div></div>');
-  $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieGenderTitle+'</h3><div id="pieGender"></div></div>');
-  $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLevelTitle+'</h3><div id="pieLevel"></div></div>');
+    $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLangTitle+'</h3><div id="pieLang"></div></div>');
+    $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieGenderTitle+'</h3><div id="pieGender"></div></div>');
+    $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLevelTitle+'</h3><div id="pieLevel"></div></div>');
 
-  generatePieChart(pieLang, langData, 'pieLang');
-  generatePieChart(pieGender, genderData, 'pieGender');
-  generatePieChart(pieLevel, levelData, 'pieLevel');
+    donutLang = generatePieChart(langData, 'pieLang');
+    donutGender = generatePieChart(genderData, 'pieGender');
+    donutLevel = generatePieChart(levelData, 'pieLevel');
 
-  // bar charts
+    // bar charts
 
-  var positionData = getDataByIndicator('Functional Area');
-  var partnerData = getDataByIndicator('Partner/Organisation');
+    var positionData = getDataByIndicator('Functional Area');
+    var partnerData = getDataByIndicator('Partner/Organisation');
 
-  // var positionData = getFormattedDataByIndicator('Title/Position/Function');
+    // var positionData = getFormattedDataByIndicator('Title/Position/Function');
 
-  var barchartPositionTitle = 'Deployments by Position',
-      barchartOrgTitle = 'Deployments by partner org',
-      barchartCountriesTitle = 'Deployments by funding';
+    var barchartPositionTitle = 'Deployments by Position',
+        barchartOrgTitle = 'Deployments by partner org',
+        barchartCountriesTitle = 'Deployments by funding';
 
-  $('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartPositionTitle+'</h3><div id="barchartPosition"></div></div>');
-  $('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartOrgTitle+'</h3><div id="barchartOrg"></div></div>');
-  $('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartCountriesTitle+'</h3><div id="barchartCountries"></div></div>');
+    $('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartPositionTitle+'</h3><div id="barchartPosition"></div></div>');
+    $('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartOrgTitle+'</h3><div id="barchartOrg"></div></div>');
+    $('#barcharts').append('<div class="barchart col-4"><div><h3 class="header">'+barchartCountriesTitle+'</h3><div id="barchartCountries"></div></div>');
 
-  generateBarChart(barchartPosition,positionData, 'barchartPosition');
-  generateBarChart(barchartOrg, partnerData, 'barchartOrg');
+    generateBarChart(barchartPosition,positionData, 'barchartPosition');
+    generateBarChart(barchartOrg, partnerData, 'barchartOrg');
 
-} //initDisplay
+  } //initDisplay
+
 
   function drawMap(){
-    console.log(countries)
     var width = $('#map').width();//viewportWidth;
     var height = 400;//(isMobile) ? viewportHeight * .5 : viewportHeight;
     var mapScale = width/3.5;//(isMobile) ? width/3.5 : width/5.5;

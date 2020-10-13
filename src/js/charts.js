@@ -48,7 +48,10 @@ function drawRankingChart(data) {
 	    .attr('height', barHeight)
 	    .attr('width', function(d) {
 	    	return d.value;
-	    });	
+	    })
+	    .on('click', function(d){
+	    	updateViz(d.key);
+	    });
 
 	 // add min/max labels
 	bars.append('text')
@@ -71,12 +74,12 @@ function drawRankingChart(data) {
 	    });
 }
 
-var pieLang, pieGender, pieLevel;
+var donutLang, donutGender, donutLevel;
 
-function generatePieChart(chart, data, bind) {
+function generatePieChart(data, bind) {
 	// piechart lang req
 
-	chart = c3.generate({
+	var chart = c3.generate({
 		bindto: '#'+bind,
 		size: { width: 250, height: 200},
 		data: {
@@ -87,12 +90,13 @@ function generatePieChart(chart, data, bind) {
 			pattern: ['#1EBFB3', '#71D7CF', '#C7EFEC']
 		}
 	});
+
+	return chart ;
 }
 
 var barchartPosition,
 	barchartOrg,
 	barchartCountries;
-
 
 
 function generateBarChart(chart, data, bind) {
@@ -129,6 +133,28 @@ function generateBarChart(chart, data, bind) {
 
 }//generateBarChart
 
+function updateViz(filter) {
+	sbpFilteredData = sbpData.filter(function(d){
+	  return d[dataFilterBy] == filter ;
+	});
+	// console.log(sbpFilteredData)
+	var countries = [],
+		dutyStations = [];
+	sbpFilteredData.forEach( function(element, index) {
+		countries.includes(element['ISO3 code']) ? '' : countries.push(element['ISO3 code']);
+        dutyStations.includes(element['Duty Station']) ? '' : dutyStations.push(element['Duty Station']);
+	});
 
+	//update map
+
+	//update donuts 
+	var langData = getFormattedDataByIndicator('Language Requirements');
+	var genderData  = getFormattedDataByIndicator('Gender');
+    var levelData  = getFormattedDataByIndicator('Grade');
+
+	donutLang.load({columns: langData, unload: true });
+	donutGender.load({columns: genderData, unload: true });
+	donutLevel.load({columns: levelData, unload: true });
+}
 
 

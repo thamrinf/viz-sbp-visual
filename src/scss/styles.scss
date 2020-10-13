@@ -149,9 +149,14 @@ h3 {
 	.tick {
 		font-size: 12px;
 	}
+
 }
 
-
+.bar-container {
+	rect {
+		cursor: pointer;
+	}
+}
 
 footer {
 	background-color: #353535;
