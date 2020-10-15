@@ -145,6 +145,32 @@ h3 {
   }
 }
 
+
+
+.d3-tip {
+    padding: 10px;
+    background-color: #FFF;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border: 0px;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #000;
+    transition: 0.3s opacity ease;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.map-tip{
+  position: absolute;
+}
+
+
+.hidden { 
+  display: none; 
+}
+
+
 .barchart {
 	.tick {
 		font-size: 12px;

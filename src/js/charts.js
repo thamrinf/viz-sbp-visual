@@ -74,14 +74,14 @@ function drawRankingChart(data) {
 	    });
 }
 
-var donutLang, donutGender, donutLevel;
+var donutLang, donutGender, donutLevel, donutStatus;
 
 function generatePieChart(data, bind) {
 	// piechart lang req
 
 	var chart = c3.generate({
 		bindto: '#'+bind,
-		size: { width: 250, height: 200},
+		size: { width: 190, height: 200},
 		data: {
 			columns: data,
 			type: 'donut'
@@ -99,12 +99,11 @@ var barchartPosition,
 	barchartCountries;
 
 
-function generateBarChart(chart, data, bind) {
-	//barchart deployment by position
-	chart = c3.generate({
+function generateBarChart(data, bind) {
+	var chart = c3.generate({
 		bindto: '#'+bind,
 		size: { height: 500 },
-		padding: {right: 15, left: 60},
+		padding: {right: 10, left: 180},
 	    data: {
 	        x: 'x',
 	        columns: data,
@@ -118,26 +117,35 @@ function generateBarChart(chart, data, bind) {
 	      x: {
 	          type : 'category',
 	          tick: {
-	          	outer: false
+	          	outer: false,
+	          	multiline: false
 	          }
 	      },
 	      y: {
 	      	tick: {
 	      		outer: false,
-	      		format: d3.format('.2s'),
+	      		format: d3.format(','),
 	      		count: 5,
 	      	}
 	      } 
+	    },
+	    legend: {
+	    	show: false
 	    }
 	}); 
+	return chart;
 
 }//generateBarChart
 
 function updateViz(filter) {
-	sbpFilteredData = sbpData.filter(function(d){
-	  return d[dataFilterBy] == filter ;
-	});
-	// console.log(sbpFilteredData)
+	if (filter == undefined) {
+		sbpFilteredData = sbpData;
+	} else {
+		sbpFilteredData = sbpData.filter(function(d){
+		  return d[dataFilterBy] == filter ;
+		});
+	}
+
 	var countries = [],
 		dutyStations = [];
 	sbpFilteredData.forEach( function(element, index) {
@@ -145,7 +153,22 @@ function updateViz(filter) {
         dutyStations.includes(element['Duty Station']) ? '' : dutyStations.push(element['Duty Station']);
 	});
 
+	// update key figures
+	// createKeyFigure("#keyfig", "Deployments", "deployments", deployments);
+    d3.select('.deployments').text(sbpFilteredData.length);
+    d3.select('.countries').text(countries.length);
+    d3.select('.dutyStations').text(dutyStations.length);
+
 	//update map
+	mapsvg.selectAll('path').each(function(item){
+		d3.select(this).transition().duration(500).attr("fill", function(d){
+			var color = '#F2F2EF';
+            countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
+            return color;
+          });
+
+	});
+
 
 	//update donuts 
 	var langData = getFormattedDataByIndicator('Language Requirements');
@@ -155,6 +178,12 @@ function updateViz(filter) {
 	donutLang.load({columns: langData, unload: true });
 	donutGender.load({columns: genderData, unload: true });
 	donutLevel.load({columns: levelData, unload: true });
+
+	var positionData = getDataByIndicator('Functional Area');
+	var partnerData = getDataByIndicator('Partner/Organisation');
+
+	barchartPosition.load({columns: positionData, unload: true });
+	barchartOrg.load({columns: partnerData, unload: true });
 }
 
 
