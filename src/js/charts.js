@@ -61,7 +61,7 @@ function drawRankingChart(data) {
 	    })
 	    .attr('y', function(d) { return barHeight/2 + 4; })
 	    .text(function (d) {
-	      return d3.format('.3s')(d.value);
+	      return d3.format('d')(d.value);
 	    });
 
 	bars.append('text')
@@ -118,19 +118,32 @@ function generateBarChart(data, bind) {
 	          type : 'category',
 	          tick: {
 	          	outer: false,
-	          	multiline: false
+	          	multiline: false,
+	          	culling: false
 	          }
 	      },
 	      y: {
 	      	tick: {
 	      		outer: false,
-	      		format: d3.format(','),
+	      		format: d3.format('d'),
 	      		count: 5,
 	      	}
 	      } 
 	    },
+	    grid: {
+	      	y: {
+	      		show: true
+	      	}
+	    },
 	    legend: {
 	    	show: false
+	    },
+	    tooltip: {
+	    	format: {
+	    		value: function(value){
+	    			return d3.format('d')(value)
+	    		}
+	    	}
 	    }
 	}); 
 	return chart;

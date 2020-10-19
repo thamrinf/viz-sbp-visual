@@ -63,6 +63,8 @@ function getDataByIndicator(indicator) {
         dataX.push(element.key);
         dataY.push(element.value);
     });
+    
+    dataY.unshift('value');
    return [dataX, dataY]; 
 
 }

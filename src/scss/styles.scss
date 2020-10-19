@@ -175,6 +175,11 @@ h3 {
 	.tick {
 		font-size: 12px;
 	}
+	.c3 {
+		height: 250px;
+		overflow: scroll;
+	}
+
 
 }
 
@@ -189,6 +194,7 @@ footer {
 	color: #FFF;
 	padding: 20px 0 10px;
 	opacity: 0;
+	margin-top: 10px;
 }
 
 .logos {
@@ -200,6 +206,21 @@ footer {
 	}
 }
 
+
+.c3-legend-background {
+  stroke: none;
+}
+
+.c3 text {
+	fill: #000 !important;
+	font-family: 'Source Sans Pro', sans-serif;
+}
+
+.c3-axis {
+	.tick text {
+		fill: #000;
+	}
+}
 
 @media only screen and (max-width: 767px) {
 	.logos {
