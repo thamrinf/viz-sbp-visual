@@ -1250,6 +1250,10 @@ h3 {
 .barchart .tick {
   font-size: 12px; }
 
+.barchart .c3 {
+  height: 250px;
+  overflow: scroll; }
+
 .bar-container rect {
   cursor: pointer; }
 
@@ -1257,13 +1261,24 @@ footer {
   background-color: #353535;
   color: #FFF;
   padding: 20px 0 10px;
-  opacity: 0; }
+  opacity: 0;
+  margin-top: 10px; }
 
 .logos img {
   margin-right: 40px;
   margin-bottom: 0;
   vertical-align: top;
   width: auto; }
+
+.c3-legend-background {
+  stroke: none; }
+
+.c3 text {
+  fill: #000 !important;
+  font-family: 'Source Sans Pro', sans-serif; }
+
+.c3-axis .tick text {
+  fill: #000; }
 
 @media only screen and (max-width: 767px) {
   .logos .grid-container > div {
