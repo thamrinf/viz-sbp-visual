@@ -235,6 +235,9 @@ $("input[name='agencies']").change(function() {
       d3.select('#rankingChart').select('svg').remove();
       drawRankingChart(dataByAgencies);
       updateViz();
+      // reset select to default
+      var select = $('#rankingSelect').val();
+      select != 'months' ? $('#rankingSelect').val('months') : '';
   }
 });
 
@@ -245,8 +248,25 @@ $("input[name='roster']").change(function() {
       d3.select('#rankingChart').select('svg').remove();
       drawRankingChart(dataByRoster);
       updateViz();
+
+      // reset select to default
+      var select = $('#rankingSelect').val();
+      select != 'months' ? $('#rankingSelect').val('months') : '';
   }
 });
+
+$('#rankingSelect').on('change', function(e){
+  var select = $('#rankingSelect').val();
+  if (select == "days") {
+    var data = d3.nest()
+        .key(function(d){ return d[dataFilterBy]; })
+        .rollup(function(v) { return d3.sum(v, function(d){ return Number(d['Total Days']);})})
+        .entries(sbpData).sort(sort_value);
+    d3.select('#rankingChart').select('svg').remove();
+    drawRankingChart(data);
+    console.log(data)
+  }
+})
 
   function initTracking() {
     //initialize mixpanel

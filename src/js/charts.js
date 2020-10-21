@@ -12,7 +12,8 @@ function drawRankingChart(data) {
 
 	// data = [10, 30, 50, 56, 78, 100];
 
-	var maxVal = data[0].value; // data is sorted by value
+	var maxVal = data[0].value; 
+	var divide = (maxVal > 1000) ? 1000: 1;
 	var x = d3.scaleLinear()
 	    .domain([0, maxVal])
 	    .range([0, width - margin.left - margin.right]);
@@ -47,7 +48,9 @@ function drawRankingChart(data) {
 	    .attr('fill', barColor)
 	    .attr('height', barHeight)
 	    .attr('width', function(d) {
-	    	return d.value;
+	    	var w = x(d.value);
+      		if (w<0) w = 0;
+      		return w;
 	    })
 	    .on('click', function(d){
 	    	updateViz(d.key);
