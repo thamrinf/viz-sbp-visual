@@ -1,19 +1,20 @@
 // window.$ = window.jQuery = require('jquery');
 var dimension, group, 
 	leftBarChart;
+var mapColorRange = ['#1EBFB3', '#71D7CF', '#C7EFEC'];//['#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#005a32'];
 
 function drawRankingChart(data) {
 	var margin = {top: 0, right: 40, bottom: 30, left: 50};
 	var width = 300,
 		height = 500;
 	var barColor = '#009EDB' ;
-  	var maxVal = 100;
   	var barHeight = 25;
   	var barPadding = 20;
 
 	// data = [10, 30, 50, 56, 78, 100];
 
-	var maxVal = data[0].value; // data is sorted by value
+	var maxVal = data[0].value; 
+	var divide = (maxVal > 1000) ? 1000: 1;
 	var x = d3.scaleLinear()
 	    .domain([0, maxVal])
 	    .range([0, width - margin.left - margin.right]);
@@ -48,7 +49,9 @@ function drawRankingChart(data) {
 	    .attr('fill', barColor)
 	    .attr('height', barHeight)
 	    .attr('width', function(d) {
-	    	return d.value;
+	    	var w = x(d.value);
+      		if (w<0) w = 0;
+      		return w;
 	    })
 	    .on('click', function(d){
 	    	updateViz(d.key);
@@ -78,8 +81,6 @@ function drawRankingChart(data) {
 var donutLang, donutGender, donutLevel, donutStatus;
 
 function generatePieChart(data, bind) {
-	// piechart lang req
-
 	var chart = c3.generate({
 		bindto: '#'+bind,
 		size: { width: 190, height: 200},
@@ -89,10 +90,21 @@ function generatePieChart(data, bind) {
 		},
 		color: {
 			pattern: ['#1EBFB3', '#71D7CF', '#C7EFEC']
+		},
+		legend: {
+			hide: getLegendItemToHide(data)
 		}
 	});
 
 	return chart ;
+}
+
+function getLegendItemToHide(data) {
+	var items = [];
+	for (var i = data.length - 1; i > 1; i--) {
+	 	items.push(data[i][0]);
+	 } 
+	 return items;
 }
 
 var barchartPosition,
@@ -174,14 +186,15 @@ function updateViz(filter) {
     d3.select('.dutyStations').text(dutyStations.length);
 
 	//update map
-	mapsvg.selectAll('path').each(function(item){
-		d3.select(this).transition().duration(500).attr("fill", function(d){
-			var color = '#F2F2EF';
-            countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
-            return color;
-          });
+	// mapsvg.selectAll('path').each(function(item){
+	// 	d3.select(this).transition().duration(500).attr("fill", function(d){
+	// 		var color = '#F2F2EF';
+ //            countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
+ //            return color;
+ //          });
 
-	});
+	// });
+	choroplethMap();
 
 
 	//update donuts 
@@ -200,6 +213,38 @@ function updateViz(filter) {
 	barchartOrg.load({columns: partnerData, unload: true });
 }
 
+
+function choroplethMap() {
+	var data = d3.nest()
+			.key(function(d){ return d['ISO3 code']; })
+			.rollup(function(d){ return d.length; })
+			.entries(sbpFilteredData).sort(sort_value);
+
+	var select = $('#rankingSelect').val();
+
+	if (select == "days") {
+		data = d3.nest()
+			.key(function(d){ return d['ISO3 code']; })
+			.rollup(function(v) { return d3.sum(v, function(d) { return d['Total Days']; }); })
+			.entries(sbpFilteredData).sort(sort_value);
+	}
+
+	var max = data[0].value;
+
+	var mapScale = d3.scaleQuantize()
+			.domain([0, max])
+			.range(mapColorRange);
+    
+    mapsvg.selectAll('path').each( function(element, index) {
+        d3.select(this).transition().duration(500).attr('fill', function(d){
+            var filtered = data.filter(pt => pt.key== d.properties.ISO_A3);
+            var num = (filtered.length != 0) ? filtered[0].value : null ;
+            var clr = (num == null) ? '#F2F2EF' : mapScale(num);
+            return clr;
+        });
+    });
+
+} //choroplethMap
 
 
 function hxlProxyToJSON(input){
@@ -354,8 +399,8 @@ $( document ).ready(function() {
     var genderData  = getFormattedDataByIndicator('Gender');
     var levelData  = getFormattedDataByIndicator('Grade');
     var statusData = [
-            ['met', 70],
-            ['unmet', 30]
+            ['Met', 70],
+            ['Unmet', 30]
         ];
 
     var pieLangTitle = 'Language Requirements',
@@ -437,12 +482,15 @@ $( document ).ready(function() {
           .attr("id", function(d) {
             return d.properties.ISO_A3;
           })
-          .attr("d", path)
-          .attr("fill", function(d){
-            var color = '#F2F2EF';
-            countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
-            return color;
-          });
+          .attr("d", path);
+          // .attr("fill", function(d){
+          //   var color = '#F2F2EF';
+          //   countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
+          //   return color;
+          // });
+    
+    //fill
+    choroplethMap();
 
     var tipPays = d3.select('#pays').selectAll('path') 
           .on("mousemove", function(d){ 
@@ -457,18 +505,18 @@ $( document ).ready(function() {
                   .rollup(function(d){ return d.length; })
                   .entries(countryData).sort(sort_value);
 
-              var content = '<label class="h3 label-header">' + d.properties.NAME_LONG + '</label><br/><br/>';
+              var content = '<label class="h3 label-header">' + d.properties.NAME_LONG.toUpperCase() + '</label><br/>';
 
-              content += '# of deployments: ' + numFormat(countryData.length) + '<br/>';
-              content += '# of UN agencies: ' + numFormat(orgs.length)+ '<br/>';
+              content += '# Deployments: ' + numFormat(countryData.length) + '<br/>';
+              content += '# UN agencies: ' + numFormat(orgs.length)+ '<br/>';
               //gender
-              content += 'Gender : ' + '<br/>';
+              content += 'Gender : <ul>';
               var total = d3.sum(gender, function(d){ return d.value; });
               gender.forEach( function(element, index) {
                 var pct = ((element.value/total)*100).toFixed(0) ;
-                content += '<ul>'+element.key + ': ' + pct + '%' + '</ul>';
+                content += '<li>'+element.key + ': ' + pct + '%' + '</li>';
               });
-
+              content += '</ul>';
               showMapTooltip(d, maptip, content);
             }
 
@@ -476,9 +524,6 @@ $( document ).ready(function() {
           .on("mouseout", function(d) { 
             hideMapTooltip(maptip); 
           });
-
-
-      
   }
 
   /*********************/
@@ -514,6 +559,11 @@ $("input[name='agencies']").change(function() {
       dataFilterBy = 'Organization';
       d3.select('#rankingChart').select('svg').remove();
       drawRankingChart(dataByAgencies);
+
+      // reset select to default
+      var select = $('#rankingSelect').val();
+      select != 'months' ? $('#rankingSelect').val('months') : '';
+
       updateViz();
   }
 });
@@ -524,9 +574,30 @@ $("input[name='roster']").change(function() {
       dataFilterBy = 'Partner/Organisation';
       d3.select('#rankingChart').select('svg').remove();
       drawRankingChart(dataByRoster);
+      
+
+      // reset select to default
+      var select = $('#rankingSelect').val();
+      select != 'months' ? $('#rankingSelect').val('months') : '';
+
       updateViz();
   }
 });
+
+$('#rankingSelect').on('change', function(e){
+  var select = $('#rankingSelect').val();
+  var data = (dataFilterBy == 'Organization') ? dataByAgencies : dataByRoster ; 
+  
+  if (select == "days") {
+    data = d3.nest()
+        .key(function(d){ return d[dataFilterBy]; })
+        .rollup(function(v) { return d3.sum(v, function(d){ return Number(d['Total Days']);})})
+        .entries(sbpData).sort(sort_value);
+  }
+  d3.select('#rankingChart').select('svg').remove();
+  drawRankingChart(data);
+  updateViz();
+})
 
   function initTracking() {
     //initialize mixpanel

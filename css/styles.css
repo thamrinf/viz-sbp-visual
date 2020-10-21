@@ -1240,6 +1240,8 @@ h3 {
   transition: 0.3s opacity ease;
   z-index: 100;
   pointer-events: none; }
+  .d3-tip ul {
+    margin: 0; }
 
 .map-tip {
   position: absolute; }
@@ -1256,6 +1258,10 @@ h3 {
 
 .bar-container rect {
   cursor: pointer; }
+
+#rankingChart {
+  height: 400px;
+  overflow: scroll; }
 
 footer {
   background-color: #353535;
