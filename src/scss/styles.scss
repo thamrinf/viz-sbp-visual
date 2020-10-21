@@ -159,6 +159,9 @@ h3 {
     transition: 0.3s opacity ease;
     z-index: 100;
     pointer-events: none;
+    ul {
+    	margin: 0;
+    }
 }
 
 .map-tip{
@@ -179,14 +182,18 @@ h3 {
 		height: 250px;
 		overflow: scroll;
 	}
-
-
 }
 
 .bar-container {
 	rect {
 		cursor: pointer;
 	}
+}
+
+#rankingChart {
+	height: 400px;
+	overflow: scroll;
+
 }
 
 footer {

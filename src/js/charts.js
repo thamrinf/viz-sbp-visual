@@ -1,12 +1,12 @@
 var dimension, group, 
 	leftBarChart;
+var mapColorRange = ['#1EBFB3', '#71D7CF', '#C7EFEC'];//['#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#005a32'];
 
 function drawRankingChart(data) {
 	var margin = {top: 0, right: 40, bottom: 30, left: 50};
 	var width = 300,
 		height = 500;
 	var barColor = '#009EDB' ;
-  	var maxVal = 100;
   	var barHeight = 25;
   	var barPadding = 20;
 
@@ -80,8 +80,6 @@ function drawRankingChart(data) {
 var donutLang, donutGender, donutLevel, donutStatus;
 
 function generatePieChart(data, bind) {
-	// piechart lang req
-
 	var chart = c3.generate({
 		bindto: '#'+bind,
 		size: { width: 190, height: 200},
@@ -91,10 +89,21 @@ function generatePieChart(data, bind) {
 		},
 		color: {
 			pattern: ['#1EBFB3', '#71D7CF', '#C7EFEC']
+		},
+		legend: {
+			hide: getLegendItemToHide(data)
 		}
 	});
 
 	return chart ;
+}
+
+function getLegendItemToHide(data) {
+	var items = [];
+	for (var i = data.length - 1; i > 1; i--) {
+	 	items.push(data[i][0]);
+	 } 
+	 return items;
 }
 
 var barchartPosition,
@@ -176,14 +185,15 @@ function updateViz(filter) {
     d3.select('.dutyStations').text(dutyStations.length);
 
 	//update map
-	mapsvg.selectAll('path').each(function(item){
-		d3.select(this).transition().duration(500).attr("fill", function(d){
-			var color = '#F2F2EF';
-            countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
-            return color;
-          });
+	// mapsvg.selectAll('path').each(function(item){
+	// 	d3.select(this).transition().duration(500).attr("fill", function(d){
+	// 		var color = '#F2F2EF';
+ //            countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
+ //            return color;
+ //          });
 
-	});
+	// });
+	choroplethMap();
 
 
 	//update donuts 
@@ -202,4 +212,36 @@ function updateViz(filter) {
 	barchartOrg.load({columns: partnerData, unload: true });
 }
 
+
+function choroplethMap() {
+	var data = d3.nest()
+			.key(function(d){ return d['ISO3 code']; })
+			.rollup(function(d){ return d.length; })
+			.entries(sbpFilteredData).sort(sort_value);
+
+	var select = $('#rankingSelect').val();
+
+	if (select == "days") {
+		data = d3.nest()
+			.key(function(d){ return d['ISO3 code']; })
+			.rollup(function(v) { return d3.sum(v, function(d) { return d['Total Days']; }); })
+			.entries(sbpFilteredData).sort(sort_value);
+	}
+
+	var max = data[0].value;
+
+	var mapScale = d3.scaleQuantize()
+			.domain([0, max])
+			.range(mapColorRange);
+    
+    mapsvg.selectAll('path').each( function(element, index) {
+        d3.select(this).transition().duration(500).attr('fill', function(d){
+            var filtered = data.filter(pt => pt.key== d.properties.ISO_A3);
+            var num = (filtered.length != 0) ? filtered[0].value : null ;
+            var clr = (num == null) ? '#F2F2EF' : mapScale(num);
+            return clr;
+        });
+    });
+
+} //choroplethMap
 

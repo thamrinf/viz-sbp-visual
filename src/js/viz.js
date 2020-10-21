@@ -74,8 +74,8 @@ $( document ).ready(function() {
     var genderData  = getFormattedDataByIndicator('Gender');
     var levelData  = getFormattedDataByIndicator('Grade');
     var statusData = [
-            ['met', 70],
-            ['unmet', 30]
+            ['Met', 70],
+            ['Unmet', 30]
         ];
 
     var pieLangTitle = 'Language Requirements',
@@ -157,12 +157,15 @@ $( document ).ready(function() {
           .attr("id", function(d) {
             return d.properties.ISO_A3;
           })
-          .attr("d", path)
-          .attr("fill", function(d){
-            var color = '#F2F2EF';
-            countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
-            return color;
-          });
+          .attr("d", path);
+          // .attr("fill", function(d){
+          //   var color = '#F2F2EF';
+          //   countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
+          //   return color;
+          // });
+    
+    //fill
+    choroplethMap();
 
     var tipPays = d3.select('#pays').selectAll('path') 
           .on("mousemove", function(d){ 
@@ -177,18 +180,18 @@ $( document ).ready(function() {
                   .rollup(function(d){ return d.length; })
                   .entries(countryData).sort(sort_value);
 
-              var content = '<label class="h3 label-header">' + d.properties.NAME_LONG + '</label><br/><br/>';
+              var content = '<label class="h3 label-header">' + d.properties.NAME_LONG.toUpperCase() + '</label><br/>';
 
-              content += '# of deployments: ' + numFormat(countryData.length) + '<br/>';
-              content += '# of UN agencies: ' + numFormat(orgs.length)+ '<br/>';
+              content += '# Deployments: ' + numFormat(countryData.length) + '<br/>';
+              content += '# UN agencies: ' + numFormat(orgs.length)+ '<br/>';
               //gender
-              content += 'Gender : ' + '<br/>';
+              content += 'Gender : <ul>';
               var total = d3.sum(gender, function(d){ return d.value; });
               gender.forEach( function(element, index) {
                 var pct = ((element.value/total)*100).toFixed(0) ;
-                content += '<ul>'+element.key + ': ' + pct + '%' + '</ul>';
+                content += '<li>'+element.key + ': ' + pct + '%' + '</li>';
               });
-
+              content += '</ul>';
               showMapTooltip(d, maptip, content);
             }
 
@@ -196,9 +199,6 @@ $( document ).ready(function() {
           .on("mouseout", function(d) { 
             hideMapTooltip(maptip); 
           });
-
-
-      
   }
 
   /*********************/
@@ -234,10 +234,12 @@ $("input[name='agencies']").change(function() {
       dataFilterBy = 'Organization';
       d3.select('#rankingChart').select('svg').remove();
       drawRankingChart(dataByAgencies);
-      updateViz();
+
       // reset select to default
       var select = $('#rankingSelect').val();
       select != 'months' ? $('#rankingSelect').val('months') : '';
+
+      updateViz();
   }
 });
 
@@ -247,25 +249,29 @@ $("input[name='roster']").change(function() {
       dataFilterBy = 'Partner/Organisation';
       d3.select('#rankingChart').select('svg').remove();
       drawRankingChart(dataByRoster);
-      updateViz();
+      
 
       // reset select to default
       var select = $('#rankingSelect').val();
       select != 'months' ? $('#rankingSelect').val('months') : '';
+
+      updateViz();
   }
 });
 
 $('#rankingSelect').on('change', function(e){
   var select = $('#rankingSelect').val();
+  var data = (dataFilterBy == 'Organization') ? dataByAgencies : dataByRoster ; 
+  
   if (select == "days") {
-    var data = d3.nest()
+    data = d3.nest()
         .key(function(d){ return d[dataFilterBy]; })
         .rollup(function(v) { return d3.sum(v, function(d){ return Number(d['Total Days']);})})
         .entries(sbpData).sort(sort_value);
-    d3.select('#rankingChart').select('svg').remove();
-    drawRankingChart(data);
-    console.log(data)
   }
+  d3.select('#rankingChart').select('svg').remove();
+  drawRankingChart(data);
+  updateViz();
 })
 
   function initTracking() {
