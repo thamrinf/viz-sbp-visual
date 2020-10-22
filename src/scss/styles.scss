@@ -131,18 +131,16 @@ h4 {
       outline: 0;
     }
   }
-  .map-legend {
+}
+
+#legend {
   	background-color: #FFF;
-  	top: 20px;
+  	top: 380px; 
   	color: #000;
-  	height: 98px;
   	opacity: 0.8;
+  	left: 5px;
+  	width: 120px;
   	position: absolute;
-  	left: 20px;
-  	width: 105px;
-  	.legend-inner {
-  		padding: 10px;
-  	}
   	.label {
   		fill: #000;
   		font-size: 12px;
@@ -151,7 +149,6 @@ h4 {
       font-size: 12px;
     }
   }
-}
 
 
 .d3-tip {

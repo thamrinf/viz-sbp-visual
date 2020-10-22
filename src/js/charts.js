@@ -1,6 +1,7 @@
 var dimension, group, 
 	leftBarChart;
-var mapColorRange = ['#1EBFB3', '#71D7CF', '#C7EFEC'];//['#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#005a32'];
+// var mapColorRange = ['#C7EFEC', '#71D7CF', '#1EBFB3'];
+var mapColorRange = ['#C7EEEB', '#8FDFD9', '#1EBFB3', '#168F86', '#0B4742'];
 
 function drawRankingChart(data) {
 	var margin = {top: 30, right: 40, bottom: 0, left: 14};
@@ -49,7 +50,6 @@ function drawRankingChart(data) {
 			$(this).parent().addClass('active');
 		})
 		.on('mouseout', function(d) {
-			console.log('out');
 			$(this).parent().removeClass('active');
 		})
 	    .on('click', function(d){
@@ -98,7 +98,6 @@ var colorArray = {
 };
 
 function generatePieChart(data, bind) {
-	console.log(colorArray[bind])
 	var chart = c3.generate({
 		bindto: '#'+bind,
 		size: { width: 190, height: 200},
@@ -204,14 +203,6 @@ function updateViz(filter) {
     d3.select('.dutyStations').text(dutyStations.length);
 
 	//update map
-	// mapsvg.selectAll('path').each(function(item){
-	// 	d3.select(this).transition().duration(500).attr("fill", function(d){
-	// 		var color = '#F2F2EF';
- //            countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
- //            return color;
- //          });
-
-	// });
 	choroplethMap();
 
 
@@ -261,6 +252,21 @@ function choroplethMap() {
             return clr;
         });
     });
+
+    var legend = d3.legendColor()
+      .labelFormat(d3.format(',.0f'))
+      .cells(mapColorRange.length)
+      .scale(mapScale);
+    d3.select('#legend').remove();
+    var div = d3.select('#map');
+    var svg = div.append('svg')
+    	.attr('id', 'legend')
+      	.attr('height', '95px')
+      	.attr("transform", "translate(5, -80)");
+    
+    svg.append('g')
+      .attr('class', 'scale')
+      .call(legend);
 
 } //choroplethMap
 
