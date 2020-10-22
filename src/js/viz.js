@@ -180,12 +180,12 @@ $( document ).ready(function() {
                   .rollup(function(d){ return d.length; })
                   .entries(countryData).sort(sort_value);
 
-              var content = '<label class="h3 label-header">' + d.properties.NAME_LONG.toUpperCase() + '</label><br/>';
+              var content = '<h4>' + d.properties.NAME_LONG + '</h4>';
 
-              content += '# Deployments: ' + numFormat(countryData.length) + '<br/>';
-              content += '# UN agencies: ' + numFormat(orgs.length)+ '<br/>';
+              content += 'Deployments: ' + numFormat(countryData.length) + '<br/>';
+              content += 'UN agencies: ' + numFormat(orgs.length)+ '<br/>';
               //gender
-              content += 'Gender : <ul>';
+              content += 'Gender: <ul>';
               var total = d3.sum(gender, function(d){ return d.value; });
               gender.forEach( function(element, index) {
                 var pct = ((element.value/total)*100).toFixed(0) ;
