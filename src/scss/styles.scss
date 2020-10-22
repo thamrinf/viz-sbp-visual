@@ -135,7 +135,7 @@ h4 {
 
 #legend {
   	background-color: #FFF;
-  	top: 380px; 
+  	top: 360px; 
   	color: #000;
   	opacity: 0.8;
   	left: 5px;
@@ -144,6 +144,11 @@ h4 {
   	.label {
   		fill: #000;
   		font-size: 12px;
+  	}
+  	.legendTitle {
+  		font-size: 12px;
+  		fill: #000;
+  		transform: translate(10px, 10px);
   	}
     h3 {
       font-size: 12px;
