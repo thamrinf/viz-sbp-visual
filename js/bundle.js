@@ -1,20 +1,22 @@
 // window.$ = window.jQuery = require('jquery');
 var dimension, group, 
 	leftBarChart;
-var mapColorRange = ['#1EBFB3', '#71D7CF', '#C7EFEC'];//['#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#005a32'];
+// var mapColorRange = ['#C7EFEC', '#71D7CF', '#1EBFB3'];
+var mapColorRange = ['#C7EEEB', '#8FDFD9', '#1EBFB3', '#168F86', '#0B4742'];
 
 function drawRankingChart(data) {
-	var margin = {top: 0, right: 40, bottom: 30, left: 50};
-	var width = 300,
-		height = 500;
-	var barColor = '#009EDB' ;
-  	var barHeight = 25;
-  	var barPadding = 20;
+	var margin = {top: 30, right: 40, bottom: 0, left: 14};
+	var width = $('#rankingChart').width() + margin.left;
+	var barColor = '#009EDB';
+  	var barHeight = 8;
+  	var barPadding = 45;
+  	var height = (barHeight + barPadding) * data.length;
+  	var labelOffset = 8;
 
 	// data = [10, 30, 50, 56, 78, 100];
 
 	var maxVal = data[0].value; 
-	var divide = (maxVal > 1000) ? 1000: 1;
+	var divide = (maxVal > 1000) ? 1000 : 1;
 	var x = d3.scaleLinear()
 	    .domain([0, maxVal])
 	    .range([0, width - margin.left - margin.right]);
@@ -27,22 +29,35 @@ function drawRankingChart(data) {
 				.attr('width', width)
 				.attr('height', height)
 				.append('g')
-				.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-
-	// add the x axis
-	svg.append('g')
-	    .attr('transform', 'translate(0, '+height+')')
-	    .call(d3.axisBottom(x)
-	      .tickSizeOuter(0)
-	      .ticks(5, 's'));
+				.attr('transform', 'translate('+ margin.left + ',' + margin.top +')');
 
 	// append bars
 	bars = svg.selectAll('.bar')
-	      .data(data)
-	      .enter().append('g')
-	      .attr('class', 'bar-container')
-	      .attr('transform', function(d, i) { return 'translate(' + 0 + ', ' + (y(d.value)+30) + ')'; });
+		.data(data)
+		.enter().append('g')
+		.attr('class', function(d,i) {
+			var className = (i==0) ? 'bar-container selected' : 'bar-container';
+			return className;
+		})
+		.attr('transform', function(d, i) { return 'translate(' + 0 + ', ' + (i*(barHeight+barPadding)) + ')'; });
+
+	bars.append('rect')
+	    .attr('class', 'bar-button')
+	    .attr('fill', '#FFF')
+	    .attr('height', barHeight+barPadding)
+	    .attr('width', width)
+		.attr('transform', function(d, i) { return 'translate(-15,-30)'; })
+		.on('mouseover', function(d) {
+			$(this).parent().addClass('active');
+		})
+		.on('mouseout', function(d) {
+			$(this).parent().removeClass('active');
+		})
+	    .on('click', function(d){
+	    	updateViz(d.key);
+	    	$('.bar-container').removeClass('selected');
+			$(this).parent().addClass('selected');
+	    });
 
 	bars.append('rect')
 	    .attr('class', 'bar')
@@ -52,9 +67,6 @@ function drawRankingChart(data) {
 	    	var w = x(d.value);
       		if (w<0) w = 0;
       		return w;
-	    })
-	    .on('click', function(d){
-	    	updateViz(d.key);
 	    });
 
 	 // add min/max labels
@@ -63,7 +75,7 @@ function drawRankingChart(data) {
 	    .attr('x', function(d) {
 	      return 200;
 	    })
-	    .attr('y', function(d) { return barHeight/2 + 4; })
+	    .attr('y', function(d) { return -labelOffset; })
 	    .text(function (d) {
 	      return d3.format('d')(d.value);
 	    });
@@ -72,13 +84,19 @@ function drawRankingChart(data) {
 	    .attr('class', 'label-num')
 	    // .attr('text-anchor', 'start')
 	    .attr('x', 0)
-	    .attr('y', function(d) { return -4; })
+	    .attr('y', function(d) { return -labelOffset; })
 	    .text(function (d) {
 	      return d.key; //d3.format('.3s')(d.value);
 	    });
 }
 
 var donutLang, donutGender, donutLevel, donutStatus;
+var colorArray = {
+	pieLang: ['#FF9D4D','#FEAC68','#FEBA83','#FDC99D','#FDD7B8','#FCE6D3'],
+	pieGender: ['#9C27B0','#BD70CB','#DEB8E5'],
+	pieLevel: ['#28A02C','#43AC46','#5EB861','#79C47B','#94CF95','#AFDBB0','#CAE7CA'],
+	pieStatus: ['#1EBFB3', '#C7EFEC'],
+};
 
 function generatePieChart(data, bind) {
 	var chart = c3.generate({
@@ -89,7 +107,7 @@ function generatePieChart(data, bind) {
 			type: 'donut'
 		},
 		color: {
-			pattern: ['#1EBFB3', '#71D7CF', '#C7EFEC']
+			pattern: colorArray[bind]
 		},
 		legend: {
 			hide: getLegendItemToHide(data)
@@ -186,14 +204,6 @@ function updateViz(filter) {
     d3.select('.dutyStations').text(dutyStations.length);
 
 	//update map
-	// mapsvg.selectAll('path').each(function(item){
-	// 	d3.select(this).transition().duration(500).attr("fill", function(d){
-	// 		var color = '#F2F2EF';
- //            countries.includes(d.properties.ISO_A3) ? color = mapCountryColor : '';
- //            return color;
- //          });
-
-	// });
 	choroplethMap();
 
 
@@ -243,6 +253,21 @@ function choroplethMap() {
             return clr;
         });
     });
+
+    var legend = d3.legendColor()
+      .labelFormat(d3.format(',.0f'))
+      .cells(mapColorRange.length)
+      .scale(mapScale);
+    d3.select('#legend').remove();
+    var div = d3.select('#map');
+    var svg = div.append('svg')
+    	.attr('id', 'legend')
+      	.attr('height', '95px')
+      	.attr("transform", "translate(5, -80)");
+    
+    svg.append('g')
+      .attr('class', 'scale')
+      .call(legend);
 
 } //choroplethMap
 
@@ -505,12 +530,12 @@ $( document ).ready(function() {
                   .rollup(function(d){ return d.length; })
                   .entries(countryData).sort(sort_value);
 
-              var content = '<label class="h3 label-header">' + d.properties.NAME_LONG.toUpperCase() + '</label><br/>';
+              var content = '<h4>' + d.properties.NAME_LONG + '</h4>';
 
-              content += '# Deployments: ' + numFormat(countryData.length) + '<br/>';
-              content += '# UN agencies: ' + numFormat(orgs.length)+ '<br/>';
+              content += 'Deployments: ' + numFormat(countryData.length) + '<br/>';
+              content += 'UN agencies: ' + numFormat(orgs.length)+ '<br/>';
               //gender
-              content += 'Gender : <ul>';
+              content += 'Gender: <ul>';
               var total = d3.sum(gender, function(d){ return d.value; });
               gender.forEach( function(element, index) {
                 var pct = ((element.value/total)*100).toFixed(0) ;

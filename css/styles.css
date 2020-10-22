@@ -1137,6 +1137,9 @@ main {
   flex: 1;
   opacity: 0; }
 
+h1 {
+  font-size: 30px; }
+
 h3 {
   color: #000;
   font-family: 'Gotham-Bold', sans-serif;
@@ -1148,6 +1151,12 @@ h3 {
     color: #FFF;
     margin: 18px 0;
     padding: 4px 6px; }
+
+h4 {
+  font-family: 'Gotham-Bold', sans-serif;
+  font-size: 14px;
+  margin: 0;
+  padding-bottom: 5px; }
 
 .checks {
   display: flex;
@@ -1165,9 +1174,6 @@ h3 {
   white-space: pre-wrap;
   width: 100%; }
 
-#keyfig .key-figure .inner {
-  border-bottom: 1px solid #CCC; }
-
 #keyfig .key-figure:last-child {
   margin-right: 0; }
 
@@ -1176,12 +1182,12 @@ h3 {
   font-family: 'Gotham-Light', sans-serif;
   font-size: 36px;
   line-height: 36px;
-  padding: 20px 0; }
+  padding: 10px 0 0; }
   #keyfig .num span {
     font-size: 26px; }
 
 .map-container {
-  margin: 30px 0 15px; }
+  margin: 20px 0 10px; }
 
 #map {
   fill: #A6D8E8;
@@ -1211,22 +1217,20 @@ h3 {
       background: rgba(255, 255, 255, 0.8); }
     #map .zoom-controls button:focus {
       outline: 0; }
-  #map .map-legend {
-    background-color: #FFF;
-    top: 20px;
-    color: #000;
-    height: 98px;
-    opacity: 0.8;
-    position: absolute;
-    left: 20px;
-    width: 105px; }
-    #map .map-legend .legend-inner {
-      padding: 10px; }
-    #map .map-legend .label {
-      fill: #000;
-      font-size: 12px; }
-    #map .map-legend h3 {
-      font-size: 12px; }
+
+#legend {
+  background-color: #FFF;
+  top: 380px;
+  color: #000;
+  opacity: 0.8;
+  left: 5px;
+  width: 120px;
+  position: absolute; }
+  #legend .label {
+    fill: #000;
+    font-size: 12px; }
+  #legend h3 {
+    font-size: 12px; }
 
 .d3-tip {
   padding: 10px;
@@ -1256,12 +1260,23 @@ h3 {
   height: 250px;
   overflow: scroll; }
 
-.bar-container rect {
+.bar-container {
   cursor: pointer; }
+  .bar-container.active .bar-button, .bar-container.selected .bar-button {
+    fill: #EBEBEB; }
+  .bar-container.active .label-num, .bar-container.selected .label-num {
+    font-weight: 600; }
+  .bar-container .bar,
+  .bar-container .label-num {
+    pointer-events: none; }
 
 #rankingChart {
-  height: 400px;
-  overflow: scroll; }
+  height: 600px;
+  overflow-x: hidden;
+  overflow-y: scroll; }
+
+.label-num {
+  font-size: 14px; }
 
 footer {
   background-color: #353535;
