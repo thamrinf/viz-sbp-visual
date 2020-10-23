@@ -138,9 +138,14 @@ h4 {
   	top: 360px; 
   	color: #000;
   	opacity: 0.8;
+  	padding-left: 5px;
+  	padding-top: 5px;
   	left: 5px;
-  	width: 120px;
+  	width: 130px;
   	position: absolute;
+  	/*.scale {
+  		transform: translate(10, 30px);
+  	}*/
   	.label {
   		fill: #000;
   		font-size: 12px;
@@ -148,7 +153,7 @@ h4 {
   	.legendTitle {
   		font-size: 12px;
   		fill: #000;
-  		transform: translate(10px, 10px);
+  		transform: translate(0, 8px);
   	}
     h3 {
       font-size: 12px;

@@ -229,7 +229,7 @@ function choroplethMap() {
 			.rollup(function(d){ return d.length; })
 			.entries(sbpFilteredData).sort(sort_value);
 
-	var legendTitle = "Deployments";
+	var legendTitle = "Number of Deployments";
 	var select = $('#rankingSelect').val();
 
 	if (select == "days") {
@@ -238,7 +238,7 @@ function choroplethMap() {
 			.rollup(function(v) { return d3.sum(v, function(d) { return d['Total Days']; }); })
 			.entries(sbpFilteredData).sort(sort_value);
 
-		legendTitle = "Deployments (Days)";
+		// legendTitle = "Number of Deployments (Days)";
 	}
 
 	var max = data[0].value;
@@ -268,7 +268,7 @@ function choroplethMap() {
     var div = d3.select('#map');
     var svg = div.append('svg')
     	.attr('id', 'legend')
-      	.attr('height', '110px')
+      	.attr('height', '115px')
       	.attr("transform", "translate(5, -80)");
     
     svg.append('g')
