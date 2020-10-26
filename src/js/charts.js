@@ -12,9 +12,13 @@ function drawRankingChart(data) {
   	var height = (barHeight + barPadding) * data.length;
   	var labelOffset = 8;
 
-	// data = [10, 30, 50, 56, 78, 100];
+  	var total = d3.sum(data, function(d){ return d.value;});
 
 	var maxVal = data[0].value; 
+	//clone data
+  	var dataPlus = [...data];
+  	dataPlus.unshift({key: "Global", value: total });
+  	maxVal = dataPlus[0].value; 
 	var divide = (maxVal > 1000) ? 1000 : 1;
 	var x = d3.scaleLinear()
 	    .domain([0, maxVal])
@@ -32,7 +36,7 @@ function drawRankingChart(data) {
 
 	// append bars
 	bars = svg.selectAll('.bar')
-		.data(data)
+		.data(dataPlus)
 		.enter().append('g')
 		.attr('class', function(d,i) {
 			var className = (i==0) ? 'bar-container selected' : 'bar-container';
@@ -76,7 +80,7 @@ function drawRankingChart(data) {
 	    })
 	    .attr('y', function(d) { return -labelOffset; })
 	    .text(function (d) {
-	      return d3.format('d')(d.value);
+	      return d3.format(',')(d.value);
 	    });
 
 	bars.append('text')
@@ -85,7 +89,7 @@ function drawRankingChart(data) {
 	    .attr('x', 0)
 	    .attr('y', function(d) { return -labelOffset; })
 	    .text(function (d) {
-	      return d.key; //d3.format('.3s')(d.value);
+	      return d.key;
 	    });
 }
 
@@ -130,14 +134,18 @@ var barchartPosition,
 
 
 function generateBarChart(data, bind) {
+	var hauteur = (data[0].length > 5) ? 500 : 250;
 	var chart = c3.generate({
 		bindto: '#'+bind,
-		size: { height: 500 },
+		size: { height: hauteur },
 		padding: {right: 10, left: 180},
 	    data: {
 	        x: 'x',
 	        columns: data,
 	        type: 'bar'
+	    },
+	    bar: {
+	    	width: 10
 	    },
 	    color: {
 	    	pattern: ['#009EDB']
@@ -181,7 +189,7 @@ function generateBarChart(data, bind) {
 }//generateBarChart
 
 function updateViz(filter) {
-	if (filter == undefined) {
+	if (filter == undefined || filter == "Global") {
 		sbpFilteredData = sbpData;
 	} else {
 		sbpFilteredData = sbpData.filter(function(d){
@@ -218,9 +226,24 @@ function updateViz(filter) {
 	var positionData = getDataByIndicator('Functional Area');
 	var partnerData = getDataByIndicator('Partner/Organisation');
 
-	barchartPosition.load({columns: positionData, unload: true });
+	var hauteur = (partnerData[0].length > 5) ? 500 : 250;
+
+	if(positionData[0].length==2 && positionData[0][1]==""){
+		$('#nochart').remove();
+    	d3.select('#barchartPosition svg').attr('class', 'hidden');
+		$('#barchartPosition').append('<div id="nochart">No chart to display</div>');
+
+	} else {
+		$('#nochart').remove();
+		d3.select('#barchartPosition svg').classed('hidden', false);
+		barchartPosition.load({columns: positionData, unload: true });
+		barchartPosition.resize({height: hauteur });	
+	}
+
+	
 	barchartOrg.load({columns: partnerData, unload: true });
-}
+	barchartOrg.resize({height: hauteur});
+}	
 
 
 function choroplethMap() {
@@ -229,7 +252,7 @@ function choroplethMap() {
 			.rollup(function(d){ return d.length; })
 			.entries(sbpFilteredData).sort(sort_value);
 
-	var legendTitle = "Deployments";
+	var legendTitle = "Number of Deployments";
 	var select = $('#rankingSelect').val();
 
 	if (select == "days") {
@@ -238,7 +261,7 @@ function choroplethMap() {
 			.rollup(function(v) { return d3.sum(v, function(d) { return d['Total Days']; }); })
 			.entries(sbpFilteredData).sort(sort_value);
 
-		legendTitle = "Deployments (Days)";
+		// legendTitle = "Number of Deployments (Days)";
 	}
 
 	var max = data[0].value;
@@ -268,8 +291,8 @@ function choroplethMap() {
     var div = d3.select('#map');
     var svg = div.append('svg')
     	.attr('id', 'legend')
-      	.attr('height', '110px')
-      	.attr("transform", "translate(5, -80)");
+      	.attr('height', '115px');
+      	//.attr("transform", "translate(5, -80)");
     
     svg.append('g')
       .attr('class', 'scale')
