@@ -18,7 +18,7 @@ function drawRankingChart(data) {
 	//clone data
   	var dataPlus = [...data];
   	dataPlus.unshift({key: "Global", value: total });
-
+  	maxVal = dataPlus[0].value; 
 	var divide = (maxVal > 1000) ? 1000 : 1;
 	var x = d3.scaleLinear()
 	    .domain([0, maxVal])
@@ -68,7 +68,6 @@ function drawRankingChart(data) {
 	    .attr('height', barHeight)
 	    .attr('width', function(d) {
 	    	var w = x(d.value);
-	    	if (w > x(maxVal)) w = x(maxVal)+10;
       		if (w<0) w = 0;
       		return w;
 	    });
@@ -81,7 +80,7 @@ function drawRankingChart(data) {
 	    })
 	    .attr('y', function(d) { return -labelOffset; })
 	    .text(function (d) {
-	      return d3.format('d')(d.value);
+	      return d3.format(',')(d.value);
 	    });
 
 	bars.append('text')
