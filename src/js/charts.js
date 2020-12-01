@@ -130,7 +130,7 @@ function getLegendItemToHide(data) {
 
 var barchartPosition,
 	barchartOrg,
-	barchartCountries;
+	barchartFunder;
 
 
 function generateBarChart(data, bind) {
@@ -207,8 +207,8 @@ function updateViz(filter) {
 	// update key figures
 	// createKeyFigure("#keyfig", "Deployments", "deployments", deployments);
     d3.select('.deployments').text(sbpFilteredData.length);
-    d3.select('.countries').text(countries.length);
-    d3.select('.dutyStations').text(dutyStations.length);
+    d3.select('.countries').text(countries.length-1);
+    d3.select('.dutyStations').text(dutyStations.length-1);
 
 	//update map
 	choroplethMap();
@@ -218,15 +218,18 @@ function updateViz(filter) {
 	var langData = getFormattedDataByIndicator('Language Requirements');
 	var genderData  = getFormattedDataByIndicator('Gender');
     var levelData  = getFormattedDataByIndicator('Grade');
+    var statusData  = getFormattedDataByIndicator('Met/Unmet');
 
 	donutLang.load({columns: langData, unload: true });
 	donutGender.load({columns: genderData, unload: true });
 	donutLevel.load({columns: levelData, unload: true });
+	donutStatus.load({columns: statusData, unload: true });
 
-	var positionData = getDataByIndicator('Functional Area');
-	var partnerData = getDataByIndicator('Partner/Organisation');
+	var positionData = getDataByIndicator('Functional');
+	// var partnerData = getDataByIndicator('Partner/Organisation');
+	var funderData = getDataByIndicator('Funded By');
 
-	var hauteur = (partnerData[0].length > 5) ? 500 : 250;
+	var hauteur = (funderData[0].length-1 > 5) ? 500 : 250;
 
 	if(positionData[0].length==2 && positionData[0][1]==""){
 		$('#nochart').remove();
@@ -238,11 +241,14 @@ function updateViz(filter) {
 		d3.select('#barchartPosition svg').classed('hidden', false);
 		barchartPosition.load({columns: positionData, unload: true });
 		barchartPosition.resize({height: hauteur });	
+
 	}
 
 	
-	barchartOrg.load({columns: partnerData, unload: true });
-	barchartOrg.resize({height: hauteur});
+	// barchartOrg.load({columns: partnerData, unload: true });
+	// barchartOrg.resize({height: hauteur});
+	barchartFunder.load({columns: funderData, unload: true });
+	barchartFunder.resize({height: hauteur});
 }	
 
 
