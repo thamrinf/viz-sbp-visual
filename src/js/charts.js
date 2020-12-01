@@ -9,9 +9,10 @@ function drawRankingChart(data) {
 	var barColor = '#009EDB';
   	var barHeight = 8;
   	var barPadding = 45;
-  	var height = (barHeight + barPadding) * data.length;
+  	var height = (barHeight + barPadding) * (data.length+1);
   	var labelOffset = 8;
 
+  	console.log(data.length)
   	var total = d3.sum(data, function(d){ return d.value;});
 
 	var maxVal = data[0].value; 
@@ -19,7 +20,7 @@ function drawRankingChart(data) {
   	var dataPlus = [...data];
   	dataPlus.unshift({key: "Global", value: total });
   	maxVal = dataPlus[0].value; 
-	var divide = (maxVal > 1000) ? 1000 : 1;
+
 	var x = d3.scaleLinear()
 	    .domain([0, maxVal])
 	    .range([0, width - margin.left - margin.right]);
@@ -207,8 +208,8 @@ function updateViz(filter) {
 	// update key figures
 	// createKeyFigure("#keyfig", "Deployments", "deployments", deployments);
     d3.select('.deployments').text(sbpFilteredData.length);
-    d3.select('.countries').text(countries.length-1);
-    d3.select('.dutyStations').text(dutyStations.length-1);
+    d3.select('.countries').text(countries.length);
+    d3.select('.dutyStations').text(dutyStations.length);
 
 	//update map
 	choroplethMap();

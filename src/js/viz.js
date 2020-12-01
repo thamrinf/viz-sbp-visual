@@ -51,6 +51,7 @@ $( document ).ready(function() {
         .rollup(function(d) { return d.length; })
         .entries(sbpFilteredData).sort(sort_value);
 
+
       dataByRoster = d3.nest()
         .key(function(d){ return d['Partner/Organisation']; })
         .rollup(function(d) { return d.length; })
