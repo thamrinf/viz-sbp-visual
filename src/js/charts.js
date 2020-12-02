@@ -12,7 +12,6 @@ function drawRankingChart(data) {
   	var height = (barHeight + barPadding) * (data.length+1);
   	var labelOffset = 8;
 
-  	console.log(data.length)
   	var total = d3.sum(data, function(d){ return d.value;});
 
 	var maxVal = data[0].value; 
@@ -259,13 +258,16 @@ function choroplethMap() {
 			.rollup(function(d){ return d.length; })
 			.entries(sbpFilteredData).sort(sort_value);
 
+	
 	var legendTitle = "Number of Deployments";
 	var select = $('#rankingSelect').val();
 
 	if (select == "days") {
+		var label = "ms_in_"+yearFilter;
 		data = d3.nest()
 			.key(function(d){ return d['ISO3 code']; })
-			.rollup(function(v) { return d3.sum(v, function(d) { return d['Total Days']; }); })
+			// .rollup(function(v) { return d3.sum(v, function(d) { return d['Total Days']; }); })
+			.rollup(function(v) { return d3.sum(v, function(d){ return Number(d[label]); })})
 			.entries(sbpFilteredData).sort(sort_value);
 
 		// legendTitle = "Number of Deployments (Days)";

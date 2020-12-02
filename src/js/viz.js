@@ -35,6 +35,10 @@ $( document ).ready(function() {
       d3.csv(DATA_URL)
     ]).then(function(data){
       geomData = topojson.feature(data[0], data[0].objects.geom);
+      var monthColLabel = "ms_in_"+yearFilter;
+      data[1].forEach( function(element, index) {
+        (element[monthColLabel] == "na") ? element[monthColLabel] = 0 : '';
+      });
       sbp = data[1];
       sbpData = sbp.filter(function(d){ return d['Deployment Year Started']==yearFilter; });
       
@@ -183,11 +187,13 @@ $( document ).ready(function() {
               var content = '<h4>' + d.properties.NAME_LONG + '</h4>';
 
               if (select =="days") {
+                var label = "ms_in_"+yearFilter;
                 var dataByMetric = d3.nest()
                     .key(function(d){ return d['ISO3 code']; })
-                    .rollup(function(v) { return d3.sum(v, function(d) { return d['Total Days']; }); })
+                    // .rollup(function(v) { return d3.sum(v, function(d) { return d['Total Days']; }); })
+                    .rollup(function(v) { return d3.sum(v, function(d){ return Number(d[label]); })})
                     .entries(countryData);
-                content += 'Deployments (Days): ' + numFormat(dataByMetric[0].value) + '<br/>';
+                content += 'Deployments (months): ' + numFormat(dataByMetric[0].value) + '<br/>';
               } else {
                 content += 'Deployments: ' + numFormat(countryData.length) + '<br/>';
               }
@@ -278,9 +284,11 @@ $('#rankingSelect').on('change', function(e){
   var data = (dataFilterBy == 'Organization') ? dataByAgencies : dataByRoster ; 
   
   if (select == "days") {
+    var label = "ms_in_"+yearFilter;
     data = d3.nest()
         .key(function(d){ return d[dataFilterBy]; })
-        .rollup(function(v) { return d3.sum(v, function(d){ return Number(d['Total Days']);})})
+        // .rollup(function(v) { return d3.sum(v, function(d){ return Number(d['Total Days']);})})
+        .rollup(function(v) { return d3.sum(v, function(d){ return Number(d[label]); })})
         .entries(sbpData).sort(sort_value);
   }
   d3.select('#rankingChart').select('svg').remove();
