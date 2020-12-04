@@ -9,7 +9,7 @@ function drawRankingChart(data) {
 	var barColor = '#009EDB';
   	var barHeight = 8;
   	var barPadding = 45;
-  	var height = (barHeight + barPadding) * data.length;
+  	var height = (barHeight + barPadding) * (data.length+1);
   	var labelOffset = 8;
 
   	var total = d3.sum(data, function(d){ return d.value;});
@@ -19,7 +19,7 @@ function drawRankingChart(data) {
   	var dataPlus = [...data];
   	dataPlus.unshift({key: "Global", value: total });
   	maxVal = dataPlus[0].value; 
-	var divide = (maxVal > 1000) ? 1000 : 1;
+
 	var x = d3.scaleLinear()
 	    .domain([0, maxVal])
 	    .range([0, width - margin.left - margin.right]);
@@ -130,7 +130,7 @@ function getLegendItemToHide(data) {
 
 var barchartPosition,
 	barchartOrg,
-	barchartCountries;
+	barchartFunder;
 
 
 function generateBarChart(data, bind) {
@@ -157,14 +157,17 @@ function generateBarChart(data, bind) {
 	          tick: {
 	          	outer: false,
 	          	multiline: false,
-	          	culling: false
+	          	fit: true,
+	          	culling: false,
+	          	format: function(x){ console.log(this.categories()); return x}
+	          	// format: function(x){ return text_truncate(chart.categories()[x], 30); }
 	          }
 	      },
 	      y: {
 	      	tick: {
 	      		outer: false,
 	      		format: d3.format('d'),
-	      		count: 5,
+	      		count: 5
 	      	}
 	      } 
 	    },
@@ -218,15 +221,18 @@ function updateViz(filter) {
 	var langData = getFormattedDataByIndicator('Language Requirements');
 	var genderData  = getFormattedDataByIndicator('Gender');
     var levelData  = getFormattedDataByIndicator('Grade');
+    var statusData  = getFormattedDataByIndicator('Met/Unmet');
 
 	donutLang.load({columns: langData, unload: true });
 	donutGender.load({columns: genderData, unload: true });
 	donutLevel.load({columns: levelData, unload: true });
+	donutStatus.load({columns: statusData, unload: true });
 
-	var positionData = getDataByIndicator('Functional Area');
-	var partnerData = getDataByIndicator('Partner/Organisation');
+	var positionData = getDataByIndicator('Functional');
+	// var partnerData = getDataByIndicator('Partner/Organisation');
+	var funderData = getDataByIndicator('Funded By');
 
-	var hauteur = (partnerData[0].length > 5) ? 500 : 250;
+	var hauteur = (funderData[0].length-1 > 5) ? 500 : 250;
 
 	if(positionData[0].length==2 && positionData[0][1]==""){
 		$('#nochart').remove();
@@ -238,11 +244,14 @@ function updateViz(filter) {
 		d3.select('#barchartPosition svg').classed('hidden', false);
 		barchartPosition.load({columns: positionData, unload: true });
 		barchartPosition.resize({height: hauteur });	
+
 	}
 
 	
-	barchartOrg.load({columns: partnerData, unload: true });
-	barchartOrg.resize({height: hauteur});
+	// barchartOrg.load({columns: partnerData, unload: true });
+	// barchartOrg.resize({height: hauteur});
+	barchartFunder.load({columns: funderData, unload: true });
+	barchartFunder.resize({height: hauteur});
 }	
 
 
@@ -252,13 +261,16 @@ function choroplethMap() {
 			.rollup(function(d){ return d.length; })
 			.entries(sbpFilteredData).sort(sort_value);
 
+	
 	var legendTitle = "Number of Deployments";
 	var select = $('#rankingSelect').val();
 
 	if (select == "days") {
+		var label = "ms_in_"+yearFilter;
 		data = d3.nest()
 			.key(function(d){ return d['ISO3 code']; })
-			.rollup(function(v) { return d3.sum(v, function(d) { return d['Total Days']; }); })
+			// .rollup(function(v) { return d3.sum(v, function(d) { return d['Total Days']; }); })
+			.rollup(function(v) { return d3.sum(v, function(d){ return Number(d[label]); })})
 			.entries(sbpFilteredData).sort(sort_value);
 
 		// legendTitle = "Number of Deployments (Days)";
