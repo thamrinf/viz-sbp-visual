@@ -160,7 +160,7 @@ function generateBarChart(data, bind) {
 	          	multiline: false,
 	          	fit: true,
 	          	culling: false,
-	          	format: function(x){ console.log(this.categories()); return x}
+	          	// format: function(x){ console.log(this.categories()); return x}
 	          	// format: function(x){ return text_truncate(chart.categories()[x], 30); }
 	          }
 	      },
