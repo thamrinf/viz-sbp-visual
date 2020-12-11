@@ -66,11 +66,30 @@ function drawRankingChart(data) {
 	    .attr('class', 'bar')
 	    .attr('fill', barColor)
 	    .attr('height', barHeight)
+	    .attr('x', 50)
 	    .attr('width', function(d) {
 	    	var w = x(d.value);
       		if (w<0) w = 0;
+      		if(w == x(maxVal)) w -= 50;
       		return w;
 	    });
+
+	var noLogo = ['Global'];
+	bars.append('image')
+		.attr('xlink:href', function(d){
+			var file = 'assets/logo/'+d.key+'.png';
+			noLogo.includes(d.key) ? file = '' : '';//'assets/logo/IOM.png' : '';
+			return file; 
+		})
+		.attr('width', 40)
+		.attr('height', 20)
+		.attr('x', function(d) {
+	      return 0;
+	    })
+	    .attr('y', function(d) { 
+	    	return -labelOffset -14; 
+	    });
+
 
 	 // add min/max labels
 	bars.append('text')
@@ -86,10 +105,14 @@ function drawRankingChart(data) {
 	bars.append('text')
 	    .attr('class', 'label-num')
 	    // .attr('text-anchor', 'start')
-	    .attr('x', 0)
+	    .attr('x', 50)
 	    .attr('y', function(d) { return -labelOffset; })
 	    .text(function (d) {
-	      return d.key;
+	    	var txt = d.key ;
+	    	if(d.key.length >21){
+	    		txt = text_truncate(txt, 21);
+	    	}
+	      return txt;
 	    });
 }
 
@@ -104,7 +127,7 @@ var colorArray = {
 function generatePieChart(data, bind) {
 	var chart = c3.generate({
 		bindto: '#'+bind,
-		size: { width: 190, height: 200},
+		size: { height: 200},
 		data: {
 			columns: data,
 			type: 'donut'
@@ -157,14 +180,19 @@ function generateBarChart(data, bind) {
 	          tick: {
 	          	outer: false,
 	          	multiline: false,
-	          	culling: false
+	          	fit: true,
+	          	culling: false,
+	          	// format: function(x){ 
+	          	// 	var catname = this.api.categories()[x];
+	          	// 	return text_truncate(catname, 30) ; 
+	          	// }
 	          }
 	      },
 	      y: {
 	      	tick: {
 	      		outer: false,
 	      		format: d3.format('d'),
-	      		count: 5,
+	      		count: 5
 	      	}
 	      } 
 	    },
@@ -218,12 +246,12 @@ function updateViz(filter) {
 	var langData = getFormattedDataByIndicator('Language Requirements');
 	var genderData  = getFormattedDataByIndicator('Gender');
     var levelData  = getFormattedDataByIndicator('Grade');
-    var statusData  = getFormattedDataByIndicator('Met/Unmet');
+    // var statusData  = getFormattedDataByIndicator('Met/Unmet');
 
 	donutLang.load({columns: langData, unload: true });
 	donutGender.load({columns: genderData, unload: true });
 	donutLevel.load({columns: levelData, unload: true });
-	donutStatus.load({columns: statusData, unload: true });
+	// donutStatus.load({columns: statusData, unload: true });
 
 	var positionData = getDataByIndicator('Functional');
 	// var partnerData = getDataByIndicator('Partner/Organisation');

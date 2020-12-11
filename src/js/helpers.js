@@ -26,6 +26,19 @@ function hxlProxyToJSON(input){
     return output;
 }
 
+text_truncate = function(str, length, ending) {
+    if (length == null) {
+      length = 100;
+    }
+    if (ending == null) {
+      ending = '...';
+    }
+    if (str.length > length) {
+      return str.substring(0, length - ending.length) + ending;
+    } else {
+      return str;
+    }
+};
 
 function createKeyFigure(target, title, className, value) {
   var targetDiv = $(target);
@@ -49,6 +62,22 @@ function getFormattedDataByIndicator(indicator) {
 
    return data; 
 
+}
+
+function loadImg(url, done){
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () { return done(this.status) }
+    xhr.open('HEAD', url, true);
+    xhr.send();
+}
+
+function imageExists (url) {
+    var test = true;
+    loadImg(url, function(status){
+        if (status == 404) test = false;
+    });
+
+    return test;
 }
 
 function getDataByIndicator(indicator) {
