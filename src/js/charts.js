@@ -82,7 +82,6 @@ function drawRankingChart(data) {
 			noLogo.includes(d.key) ? file = 'assets/logo/generic.png' : '';
 			return file; 
 		})
-		// .attr('border-radius', 50)
 		.attr('width', 40)
 		.attr('height', 35)
 		.attr('x', function(d) {
@@ -91,7 +90,6 @@ function drawRankingChart(data) {
 	    .attr('y', function(d) { 
 	    	return -labelOffset -14; 
 	    });
-
 
 	 // add min/max labels
 	bars.append('text')
