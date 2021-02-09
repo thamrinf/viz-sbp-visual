@@ -74,8 +74,7 @@ function drawRankingChart(data) {
       		return w;
 	    });
 
-	var noLogo = ['Global', 'Ministry of Foreign Affairs Iceland',
-				  'Emergency Services Academy Finland (Pelastusopoisto)'];
+	var noLogo = [];// ['Global', 'Ministry of Foreign Affairs Iceland','Emergency Services Academy Finland (Pelastusopoisto)'];
 	bars.append('image')
 		.attr('xlink:href', function(d){
 			var file = 'assets/logo/'+d.key+'.png';

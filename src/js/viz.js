@@ -1,6 +1,7 @@
 var numFormat = d3.format(',');
 var percentFormat = d3.format('.0%');
-const DATA_URL = 'https://proxy.hxlstandard.org/api/data-preview.json?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F15Y2BzrOHy_8Vh1BvO1FuotowdtFQHOUtedguzLGdhQA%2Fedit%23gid%3D306007431&format=csv';
+const DATA_URL = 'https://proxy.hxlstandard.org/api/data-preview.json?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F15Y2BzrOHy_8Vh1BvO1FuotowdtFQHOUtedguzLGdhQA%2Fedit%23gid%3D306007431&format=csv&force=on';
+ //const DATA_URL ='https://proxy.hxlstandard.org/api/data-preview.json?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F15Y2BzrOHy_8Vh1BvO1FuotowdtFQHOUtedguzLGdhQA%2Fedit%23gid%3D306007431&format=csv';
 // const DATA_URL = 'https://proxy.hxlstandard.org/api/data-preview.json?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F1exDoZsA8UQx-U5YGSS4zxivfPIOUf8-ts2CbavV7Mvg%2Fedit%23gid%3D484816643&sheet=1&format=csv';
 let isMobile = $(window).width()<600? true : false;
 let geoDataURL = 'data/worldmap.json';
@@ -66,7 +67,7 @@ $( document ).ready(function() {
       initDisplay();
       initMap();
       drawRankingChart(dataByAgencies);
-
+      noteOnYear();
  
       //remove loader and show vis
       $('.loader').hide();
@@ -231,6 +232,14 @@ $( document ).ready(function() {
     }, 100);
   }
 
+function noteOnYear () {
+  if (yearFilter == "2020") {
+    $('header h1 span').text("(data last updated October 2020)");
+  } else {
+    $('header h1 span').text("");
+  }
+}
+
 function zoomed (argument) {
   console.log("zoomed")
 }
@@ -301,6 +310,7 @@ $('#yearSelect').on('change', function(e){
   var newYear = $('#yearSelect').val();
   if (newYear != yearFilter) {
     yearFilter = newYear;
+    noteOnYear();
     sbpData = sbp.filter(function(d){ return (d['Deployment Year Started']==yearFilter && d['Met/Unmet']=='Met');  });
     sbpFilteredData = sbpData;
     //console.log(sbpData)
