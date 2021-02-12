@@ -1,7 +1,8 @@
 var numFormat = d3.format(',');
 var percentFormat = d3.format('.0%');
-// const DATA_URL = 'https://proxy.hxlstandard.org/api/data-preview.json?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F1exDoZsA8UQx-U5YGSS4zxivfPIOUf8-ts2CbavV7Mvg%2Fedit%23gid%3D255428484&format=csv';
-const DATA_URL = 'https://proxy.hxlstandard.org/api/data-preview.json?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F1exDoZsA8UQx-U5YGSS4zxivfPIOUf8-ts2CbavV7Mvg%2Fedit%23gid%3D484816643&sheet=1&format=csv';
+const DATA_URL = 'https://proxy.hxlstandard.org/api/data-preview.json?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F15Y2BzrOHy_8Vh1BvO1FuotowdtFQHOUtedguzLGdhQA%2Fedit%23gid%3D306007431&format=csv&force=on';
+ //const DATA_URL ='https://proxy.hxlstandard.org/api/data-preview.json?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F15Y2BzrOHy_8Vh1BvO1FuotowdtFQHOUtedguzLGdhQA%2Fedit%23gid%3D306007431&format=csv';
+// const DATA_URL = 'https://proxy.hxlstandard.org/api/data-preview.json?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F1exDoZsA8UQx-U5YGSS4zxivfPIOUf8-ts2CbavV7Mvg%2Fedit%23gid%3D484816643&sheet=1&format=csv';
 let isMobile = $(window).width()<600? true : false;
 let geoDataURL = 'data/worldmap.json';
 
@@ -40,7 +41,9 @@ $( document ).ready(function() {
         (element[monthColLabel] == "na") ? element[monthColLabel] = 0 : '';
       });
       sbp = data[1];
-      sbpData = sbp.filter(function(d){ return d['Deployment Year Started']==yearFilter; });
+      sbpData = sbp.filter(function(d){ 
+        return (d['Deployment Year Started']==yearFilter && d['Met/Unmet']=='Met'); 
+      });
       
       sbpFilteredData = sbpData;
 
@@ -64,7 +67,7 @@ $( document ).ready(function() {
       initDisplay();
       initMap();
       drawRankingChart(dataByAgencies);
-
+      noteOnYear();
  
       //remove loader and show vis
       $('.loader').hide();
@@ -83,7 +86,7 @@ $( document ).ready(function() {
     var langData = getFormattedDataByIndicator('Language Requirements');
     var genderData  = getFormattedDataByIndicator('Gender');
     var levelData  = getFormattedDataByIndicator('Grade');
-    var statusData = getFormattedDataByIndicator('Met/Unmet');
+    // var statusData = getFormattedDataByIndicator('Met/Unmet');
 
 
     var pieLangTitle = 'Language Requirements',
@@ -91,15 +94,15 @@ $( document ).ready(function() {
         pieLevelTitle = 'Deployments by Level',
         pieStatusTitle = 'Deployments Status';
 
-    $('#piecharts').append('<div class="pie col-3"><div><h3 class="header">'+pieLangTitle+'</h3><div id="pieLang"></div></div>');
-    $('#piecharts').append('<div class="pie col-3"><div><h3 class="header">'+pieGenderTitle+'</h3><div id="pieGender"></div></div>');
-    $('#piecharts').append('<div class="pie col-3"><div><h3 class="header">'+pieLevelTitle+'</h3><div id="pieLevel"></div></div>');
-    $('#piecharts').append('<div class="pie col-3"><div><h3 class="header">'+pieStatusTitle+'</h3><div id="pieStatus"></div></div>');
+    $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLangTitle+'</h3><div id="pieLang"></div></div>');
+    $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieGenderTitle+'</h3><div id="pieGender"></div></div>');
+    $('#piecharts').append('<div class="pie col-4"><div><h3 class="header">'+pieLevelTitle+'</h3><div id="pieLevel"></div></div>');
+    // $('#piecharts').append('<div class="pie col-3"><div><h3 class="header">'+pieStatusTitle+'</h3><div id="pieStatus"></div></div>');
 
     donutLang = generatePieChart(langData, 'pieLang');
     donutGender = generatePieChart(genderData, 'pieGender');
     donutLevel = generatePieChart(levelData, 'pieLevel');
-    donutStatus = generatePieChart(statusData, 'pieStatus');
+    // donutStatus = generatePieChart(statusData, 'pieStatus');
 
     // bar charts
 
@@ -124,8 +127,8 @@ $( document ).ready(function() {
   function drawMap(){
     var width = $('#map').width();//viewportWidth;
     var height = 400;//(isMobile) ? viewportHeight * .5 : viewportHeight;
-    var mapScale = width/3.5;//(isMobile) ? width/3.5 : width/5.5;
-    var mapCenter = [75, 8];//(isMobile) ? [10, 30] : [75, 8];
+    var mapScale = width/5.5;//(isMobile) ? width/3.5 : width/5.5;
+    var mapCenter = [25, 8];//(isMobile) ? [10, 30] : [75, 8];
 
 
     var projection = d3.geoMercator()
@@ -133,19 +136,15 @@ $( document ).ready(function() {
       .scale(mapScale)
       .translate([width / 2, height / 2]);
 
-    // zoom = d3.zoom()
-    //   .scaleExtent([1, 8])
-    //   .on("zoom", zoomed);
-
     var path = d3.geoPath().projection(projection);
 
     mapsvg = d3.select('#map')
                .append('svg')
                .attr("width", width)
                .attr("height", height);
-      //.call(zoom)
-      // .on("wheel.zoom", null)
-      // .on("dblclick.zoom", null);
+               // .call(zoom)
+               // .on("wheel.zoom", null)
+               // .on("dblclick.zoom", null);
 
     mapsvg.append("rect")
       .attr("width", "100%")
@@ -233,6 +232,17 @@ $( document ).ready(function() {
     }, 100);
   }
 
+function noteOnYear () {
+  if (yearFilter == "2020") {
+    $('header h1 span').text("(data last updated October 2020)");
+  } else {
+    $('header h1 span').text("");
+  }
+}
+
+function zoomed (argument) {
+  console.log("zoomed")
+}
 
   function showMapTooltip(d, maptip, text){
     var mouse = d3.mouse(mapsvg.node()).map( function(d) { return parseInt(d); } );
@@ -300,7 +310,8 @@ $('#yearSelect').on('change', function(e){
   var newYear = $('#yearSelect').val();
   if (newYear != yearFilter) {
     yearFilter = newYear;
-    sbpData = sbp.filter(function(d){ return d['Deployment Year Started']==yearFilter; });
+    noteOnYear();
+    sbpData = sbp.filter(function(d){ return (d['Deployment Year Started']==yearFilter && d['Met/Unmet']=='Met');  });
     sbpFilteredData = sbpData;
     //console.log(sbpData)
     dataByAgencies = d3.nest()

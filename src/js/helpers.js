@@ -64,6 +64,22 @@ function getFormattedDataByIndicator(indicator) {
 
 }
 
+function loadImg(url, done){
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () { return done(this.status) }
+    xhr.open('HEAD', url, true);
+    xhr.send();
+}
+
+function imageExists (url) {
+    var test = true;
+    loadImg(url, function(status){
+        if (status == 404) test = false;
+    });
+
+    return test;
+}
+
 function getDataByIndicator(indicator) {
     var dataX = ['x'],
         dataY = [];
