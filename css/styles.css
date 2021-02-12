@@ -1137,8 +1137,20 @@ main {
   flex: 1;
   opacity: 0; }
 
+header {
+  display: flex;
+  margin-bottom: 15px;
+  align-items: center;
+  justify-content: center; }
+
 h1 {
-  font-size: 30px; }
+  font-size: 26px;
+  margin: 0;
+  padding: 0 0 0 20px; }
+
+h1 span {
+  font-size: 10px;
+  font-weight: normal; }
 
 h3 {
   color: #000;
@@ -1157,6 +1169,13 @@ h4 {
   font-size: 14px;
   margin: 0;
   padding-bottom: 5px; }
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 80px;
+  margin-top: 10px; }
 
 .checks {
   display: flex;
@@ -1195,6 +1214,9 @@ h4 {
   padding: 10px 0 0; }
   #keyfig .num span {
     font-size: 26px; }
+
+.image {
+  border-radius: 50%; }
 
 .map-container {
   margin: 20px 0 10px; }
