@@ -24,7 +24,7 @@ let mapCountryColor = '#1EBFB3';//'#71D7CF';//'#C7EFEC';//'#1EBFB3';//'#009EDB';
 
 let zoom, g, mapsvg, markerScale;
 
-let yearFilter = $('#yearSelect').val();
+let yearFilter ; //$('#yearSelect').val();
 
 $( document ).ready(function() {
 
@@ -41,10 +41,11 @@ $( document ).ready(function() {
         (element[monthColLabel] == "na") ? element[monthColLabel] = 0 : '';
       });
       sbp = data[1];
+      generateYearSelect();
       sbpData = sbp.filter(function(d){ 
         return (d['Deployment Year Started']==yearFilter && d['Met/Unmet']=='Met'); 
       });
-      
+      console.log(sbpData);
       sbpFilteredData = sbpData;
 
       sbpFilteredData.forEach( function(element, index) {
@@ -64,6 +65,7 @@ $( document ).ready(function() {
         .rollup(function(d) { return d.length; })
         .entries(sbpFilteredData).sort(sort_value);
 
+      
       initDisplay();
       initMap();
       drawRankingChart(dataByAgencies);
@@ -220,6 +222,33 @@ $( document ).ready(function() {
           });
   }
 
+  var date_sort = function (d1, d2) {
+    if (d1 < d2) return 1;
+    if (d1 > d2) return -1;
+    return 0;
+  }
+
+  function generateYearSelect() {
+    var dateRanges = [];
+    sbp.forEach(element => {
+      dateRanges.includes(element['Deployment Year Started']) ? '' : dateRanges.push(element['Deployment Year Started']);
+    });
+    var arr = [] ;
+    dateRanges.forEach(element => {
+      element >= "2018" ? arr.push(element) : null;
+    });
+    arr.sort(date_sort);
+    var options = '';
+    for (let i = 0; i < arr.length; i++) {
+      i == 0 ? options += '<option value="' + arr[i] + '" selected>' + arr[i] + '</option>' :
+        options += '<option value="' + arr[i] + '">' + arr[i] + '</option>';
+    }
+    yearFilter = arr[0];
+    $('#yearSelect').html(options);
+    console.log(options);
+  }//generateYearSelect
+
+
   /*********************/
   /*** MAP FUNCTIONS ***/
   /*********************/
@@ -231,10 +260,10 @@ $( document ).ready(function() {
       // createMapLegend();
     }, 100);
   }
-
+var partialDataYears = ["2018", "2021"];
 function noteOnYear () {
-  if (yearFilter == "2020") {
-    $('header h1 span').text("(data last updated October 2020)");
+  if (partialDataYears.includes(yearFilter)) {
+    $('header h1 span').text("(Incomplete data)");
   } else {
     $('header h1 span').text("");
   }
@@ -327,6 +356,8 @@ $('#yearSelect').on('change', function(e){
     // reset select to default
     var select = $('#rankingSelect').val();
     select != 'months' ? $('#rankingSelect').val('months') : '';
+    $("input[name='agencies']").prop('checked', true);
+    $("input[name='roster']").prop('checked', false);
 
     d3.select('#rankingChart').select('svg').remove();
     drawRankingChart(dataByAgencies);
